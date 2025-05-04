@@ -1,7 +1,7 @@
 {
   "name": "raven-token",
   "version": "0.0.1",
-  "description": "Raven tarafından yapılan gelişmiş token aracı!",
+  "description": "Bora",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
