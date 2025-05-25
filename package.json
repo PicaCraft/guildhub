@@ -1,0 +1,12 @@
+{
+  "name": "guildhub-server",
+  "version": "1.0.0",
+  "description": "GuildHub statik site sunucusu",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
