@@ -1,24 +1,316 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>Sayfa Bulunamadı</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      background-color: #1a1a1a;
-      color: #ff5555;
-      text-align: center;
-      padding-top: 100px;
-    }
-    h1 {
-      font-size: 48px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuildHub - Sayfa Bulunamadı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a29bfe;
+            --dark-color: #2d3436;
+            --light-color: #f5f6fa;
+            --error-color: #ff7675;
+            --success-color: #00b894;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .error-content {
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .error-content::before {
+            content: "404";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30vw;
+            font-weight: 800;
+            color: rgba(108, 92, 231, 0.05);
+            z-index: -1;
+            user-select: none;
+        }
+        
+        .error-title {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+        
+        .error-message {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+        }
+        
+        .btn:hover {
+            background-color: #5649d1;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .error-search {
+            margin-top: 40px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+        }
+        
+        .error-search input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            padding-right: 50px;
+        }
+        
+        .error-search input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+        }
+        
+        .error-search button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .error-search button:hover {
+            background-color: #5649d1;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            margin-top: auto;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .social-icons {
+            margin-bottom: 20px;
+        }
+        
+        .social-icons a {
+            color: white;
+            margin: 0 10px;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .social-icons a:hover {
+            color: var(--secondary-color);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .copyright a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .copyright a:hover {
+            color: var(--primary-color);
+        }
+        
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            background-color: var(--secondary-color);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float linear infinite;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .error-title {
+                font-size: 2rem;
+            }
+            
+            .error-message {
+                font-size: 1rem;
+            }
+            
+            .error-content::before {
+                font-size: 50vw;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>404 - Sayfa Bulunamadı</h1>
-  <p>Aradığın sayfa burada değil. Belki anasayfaya dönmek istersin?</p>
-  <a href="/" style="color: #fff; text-decoration: underline;">Anasayfa</a>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <div class="error-content">
+            <h1 class="error-title">Oops! Sayfa Bulunamadı</h1>
+            <p class="error-message">Aradığınız sayfa taşınmış, silinmiş veya adı değiştirilmiş olabilir. Ana sayfaya dönerek aradığınız içeriği bulabilirsiniz.</p>
+            <a href="index.html" class="btn"><i class="fas fa-home"></i> Ana Sayfaya Dön</a>
+            
+            <div class="error-search">
+                <input type="text" placeholder="Site içinde arama yapın...">
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-discord"></i></a>
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+            <div class="copyright">
+                &copy; 2025 GuildHub. Tüm hakları saklıdır. <span style="color: var(--error-color);">♥</span> Developer
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Partikül efekti oluşturma
+        document.addEventListener('DOMContentLoaded', function() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 20;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Rastgele boyut (5px - 15px arası)
+                const size = Math.random() * 10 + 5;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Rastgele başlangıç pozisyonu
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.bottom = `-${size}px`;
+                
+                // Rastgele animasyon süresi (10s - 30s arası)
+                const duration = Math.random() * 20 + 10;
+                particle.style.animationDuration = `${duration}s`;
+                
+                // Rastgele animasyon gecikmesi (0s - 5s arası)
+                const delay = Math.random() * 5;
+                particle.style.animationDelay = `${delay}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+            
+            // Arama kutusu işlevselliği
+            const searchInput = document.querySelector('.error-search input');
+            const searchButton = document.querySelector('.error-search button');
+            
+            searchButton.addEventListener('click', function() {
+                if (searchInput.value.trim() !== '') {
+                    alert(`Arama yapılıyor: ${searchInput.value}\nBu örnek bir 404 sayfasıdır, gerçek arama işlevselliği eklenebilir.`);
+                }
+            });
+            
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && searchInput.value.trim() !== '') {
+                    alert(`Arama yapılıyor: ${searchInput.value}\nBu örnek bir 404 sayfasıdır, gerçek arama işlevselliği eklenebilir.`);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
