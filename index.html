@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Guild Hub - Discord Simülasyonu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Whitney:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        :root {
+            --discord-darkest: #1E1F22;
+            --discord-darker: #2B2D31;
+            --discord-dark: #313338;
+            --discord-light-dark: #383A40;
+            --discord-purple: #5865F2;
+            --discord-green: #57F287;
+            --discord-red: #F23F43;
+            --discord-blue: #00AFF4;
+            --text-primary: #DBDEE1;
+            --text-secondary: #949BA4;
+            --text-muted: #6A6D73;
+            --border-subtle: rgba(70, 70, 70, 0.3);
+            --shadow-discord: rgba(0, 0, 0, 0.4);
+            --gradient-accent: linear-gradient(45deg, #5865F2, #8B5CF6);
+            --glow-effect: 0 0 10px rgba(88, 101, 242, 0.5);
+            --light-bg: #F2F3F5;
+            --light-text: #2E3338;
+            --light-secondary: #4F5660;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Whitney', 'Inter', sans-serif;
+            background: var(--discord-darkest);
+            color: var(--text-primary);
+            touch-action: manipulation;
+            font-size: 14px;
+            transition: background 0.5s ease;
+        }
+
+        body.light-theme {
+            background: var(--light-bg);
+            color: var(--light-text);
+            --discord-darkest: #E3E5E8;
+            --discord-darker: #ECEDEE;
+            --discord-dark: #F2F3F5;
+            --discord-light-dark: #FFFFFF;
+            --text-primary: var(--light-text);
+            --text-secondary: var(--light-secondary);
+            --text-muted: #747F8D;
+        }
+
+        body.loaded {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top left, #5865f244, transparent 70%),
+                        radial-gradient(circle at bottom right, #f23f4344, transparent 70%),
+                        var(--discord-darkest);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeAndZoomIn 1s ease-out;
+        }
+
+        @keyframes fadeAndZoomIn {
+            0% { opacity: 0; transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .auth-container {
+            background: var(--discord-dark);
+            border-radius: 12px;
+            padding: 20px;
+            width: 90%;
+            max-width: 360px;
+            text-align: center;
+            box-shadow: 0 8px 32px var(--shadow-discord);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            0% { transform: translateY(50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .auth-container h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .auth-container p {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .auth-container button {
+            width: 100%;
+            padding: 10px;
+            background: var(--gradient-accent);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-container button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.4s ease;
+        }
+
+        .auth-container button:hover::after {
+            width: 200px;
+            height: 200px;
+        }
+
+        .auth-container button:hover {
+            background: linear-gradient(45deg, #4752C4, #7C3AED);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: var(--glow-effect);
+        }
+
+        .discord-ui-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-size: cover;
+            background-position: center;
+            transition: background 0.5s ease;
+        }
+
+        .server-list {
+            width: 100%;
+            height: 48px;
+            background: var(--discord-darkest);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            flex-shrink: 0;
+            transition: background 0.3s ease;
+        }
+
+        .server-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .server-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--discord-light-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1em;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px var(--shadow-discord);
+            position: relative;
+        }
+
+        .server-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .server-icon:hover::before {
+            opacity: 1;
+        }
+
+        .server-icon.active {
+            border-radius: 12px;
+            background: var(--gradient-accent);
+            transform: scale(1.1);
+        }
+
+        .server-icon:hover:not(.active) {
+            border-radius: 12px;
+            transform: scale(1.1);
+        }
+
+        .channel-sidebar {
+            width: 100%;
+            height: 0;
+            background: var(--discord-darker);
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .channel-sidebar.active {
+            height: 45vh;
+        }
+
+        .guild-header {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .guild-header h3 {
+            font-size: 1em;
+            font-weight: 700;
+        }
+
+        .guild-header i {
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .guild-header i:hover {
+            color: var(--text-primary);
+            transform: rotate(90deg);
+        }
+
+        .channel-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 8px;
+            scrollbar-width: thin;
+        }
+
+        .channel-list::-webkit-scrollbar { width: 5px; }
+        .channel-list::-webkit-scrollbar-track { background: var(--discord-darker); }
+        .channel-list::-webkit-scrollbar-thumb { background-color: var(--discord-light-dark); border-radius: 3px; }
+
+        .channel-category {
+            margin-bottom: 12px;
+        }
+
+        .category-header {
+            font-size: 0.75em;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding: 6px 8px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-header:hover {
+            color: var(--text-primary);
+        }
+
+        .category-header.collapsed i {
+            transform: rotate(-90deg);
+        }
+
+        .category-content {
+            display: block;
+            transition: max-height 0.4s ease;
+        }
+
+        .category-content.hidden {
+            display: none;
+        }
+
+        .channel-item, .dm-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+            margin-bottom: 2px;
+            border-radius: 4px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .channel-item::after, .dm-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(88, 101, 242, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .channel-item:hover::after, .dm-item:hover::after {
+            left: 100%;
+        }
+
+        .channel-item:hover, .dm-item:hover {
+            background: var(--discord-light-dark);
+            color: var(--text-primary);
+        }
+
+        .channel-item.active, .dm-item.active {
+            background: var(--gradient-accent);
+            color: var(--text-primary);
+        }
+
+        .channel-item i, .dm-item i {
+            font-size: 0.9em;
+            width: 16px;
+            text-align: center;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            background: var(--discord-dark);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header-main {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: var(--discord-dark);
+            border-bottom: 1px solid var(--border-subtle);
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px var(--shadow-discord);
+            transition: all 0.3s ease;
+        }
+
+        .chat-header-main:hover {
+            background: var(--discord-light-dark);
+        }
+
+        .chat-header-main i {
+            margin-right: 8px;
+            font-size: 1.2em;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .chat-header-main i:hover {
+            color: var(--text-primary);
+        }
+
+        .chat-header-main h2 {
+            font-size: 1em;
+            font-weight: 700;
+            flex-grow: 1;
+        }
+
+        .chat-header-main .search-bar {
+            display: flex;
+            align-items: center;
+            background: var(--discord-light-dark);
+            border-radius: 4px;
+            padding: 4px 8px;
+            transition: all 0.3s ease;
+        }
+
+        .chat-header-main .search-bar:hover {
+            background: var(--discord-dark);
+        }
+
+        .chat-header-main .search-bar input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 0.8em;
+            width: 80px;
+        }
+
+        .chat-header-main .toggle-sidebar {
+            margin-left: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .chat-header-main .toggle-sidebar:hover {
+            color: var(--text-primary);
+        }
+
+        .message-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            scrollbar-width: thin;
+            touch-action: pan-y;
+        }
+
+        .message-area::-webkit-scrollbar { width: 5px; }
+        .message-area::-webkit-scrollbar-track { background: var(--discord-dark); }
+        .message-area::-webkit-scrollbar-thumb { background-color: var(--discord-light-dark); border-radius: 3px; }
+
+        .message-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 5px 0;
+            animation: messageFadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .message-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .message-item:hover::before {
+            left: 100%;
+        }
+
+        @keyframes messageFadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--discord-blue);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9em;
+            color: var(--text-primary);
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            object-fit: cover;
+        }
+
+        .message-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .message-content-wrapper {
+            flex-grow: 1;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 4px;
+        }
+
+        .message-header .username {
+            font-weight: 600;
+            color: var(--discord-blue);
+            font-size: 0.85em;
+            margin-right: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .message-header .username:hover {
+            color: var(--discord-purple);
+        }
+
+        .message-header .timestamp {
+            font-size: 0.7em;
+            color: var(--text-muted);
+        }
+
+        .message-text {
+            font-size: 0.8em;
+            line-height: 1.3;
+            color: var(--text-primary);
+        }
+
+        .reactions {
+            display: flex;
+            gap: 5px;
+            margin-top: 4px;
+        }
+
+        .reaction {
+            background: var(--discord-light-dark);
+            border-radius: 8px;
+            padding: 2px 5px;
+            font-size: 0.7em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .reaction:hover {
+            background: var(--discord-purple);
+        }
+
+        .reaction.active {
+            background: var(--discord-purple);
+            color: var(--text-primary);
+        }
+
+        .message-input-area {
+            padding: 8px 10px;
+            background: var(--discord-dark);
+            flex-shrink: 0;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+            width: 100%;
+        }
+
+        .message-input-wrapper {
+            display: flex;
+            align-items: center;
+            background: var(--discord-light-dark);
+            border-radius: 5px;
+            padding: 6px 8px;
+            position: relative;
+            box-shadow: 0 2px 4px var(--shadow-discord);
+            transition: all 0.3s ease;
+        }
+
+        .message-input-wrapper:hover {
+            transform: scale(1.01);
+        }
+
+        .message-input-wrapper input {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 0.8em;
+            padding: 4px;
+        }
+
+        .message-input-wrapper .input-icon {
+            color: var(--text-secondary);
+            margin: 0 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .message-input-wrapper .input-icon:hover {
+            color: var(--text-primary);
+        }
+
+        .send-button {
+            background: var(--discord-purple);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 5px;
+            padding: 6px 10px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .send-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.4s ease;
+        }
+
+        .send-button:hover::after {
+            width: 80px;
+            height: 80px;
+        }
+
+        .send-button:hover {
+            background: var(--discord-blue);
+        }
+
+        .tag-suggestions {
+            position: absolute;
+            bottom: 45px;
+            left: 0;
+            width: 100%;
+            background: var(--discord-darker);
+            border-radius: 5px;
+            box-shadow: 0 4px 16px var(--shadow-discord);
+            display: none;
+            flex-direction: column;
+            max-height: 100px;
+            overflow-y: auto;
+            z-index: 20;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .tag-suggestions.active {
+            display: flex;
+        }
+
+        .tag-suggestion {
+            padding: 6px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: all 0.3s ease;
+        }
+
+        .tag-suggestion:hover {
+            background: var(--discord-light-dark);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 8px;
+            right: 8px;
+            font-size: 1.1em;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            color: var(--text-primary);
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 60px;
+            right: 8px;
+            background: var(--discord-purple);
+            color: var(--text-primary);
+            padding: 8px;
+            border-radius: 4px;
+            display: none;
+            animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            font-size: 0.8em;
+        }
+
+        .notification.active {
+            display: block;
+        }
+
+        @keyframes slideInRight {
+            0% { transform: translateX(100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
+        .profile-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: var(--discord-dark);
+            border-radius: 10px;
+            padding: 15px;
+            width: 90%;
+            max-width: 320px;
+            box-shadow: 0 8px 32px var(--shadow-discord);
+            z-index: 2000;
+            display: none;
+            animation: modalPop 0.4s ease-out forwards;
+        }
+
+        .profile-modal.active {
+            display: block;
+        }
+
+        @keyframes modalPop {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .profile-modal h3 {
+            font-size: 1.1em;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .profile-modal .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .profile-modal .tab {
+            padding: 6px 10px;
+            background: var(--discord-light-dark);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8em;
+        }
+
+        .profile-modal .tab.active {
+            background: var(--gradient-accent);
+        }
+
+        .profile-modal .tab:hover {
+            background: var(--discord-purple);
+        }
+
+        .profile-modal .tab-content {
+            display: none;
+        }
+
+        .profile-modal .tab-content.active {
+            display: block;
+        }
+
+        .profile-modal .form-group {
+            margin-bottom: 12px;
+        }
+
+        .profile-modal label {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .profile-modal input, .profile-modal textarea {
+            width: 100%;
+            padding: 8px;
+            background: var(--discord-light-dark);
+            border: 1px solid var(--border-subtle);
+            border-radius: 5px;
+            color: var(--text-primary);
+            font-size: 0.8em;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .profile-modal input:focus, .profile-modal textarea:focus {
+            border-color: var(--discord-purple);
+        }
+
+        .profile-modal .avatar-preview {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-bottom: 8px;
+            object-fit: cover;
+        }
+
+        .profile-modal button {
+            width: 100%;
+            padding: 8px;
+            background: var(--gradient-accent);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-modal button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.4s ease;
+        }
+
+        .profile-modal button:hover::after {
+            width: 150px;
+            height: 150px;
+        }
+
+        .profile-modal button:hover {
+            background: linear-gradient(45deg, #4752C4, #7C3AED);
+        }
+
+        .profile-modal .close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .profile-modal .close:hover {
+            color: var(--text-primary);
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px;
+            color: var(--text-muted);
+            font-size: 0.8em;
+            animation: typingPulse 1.5s infinite;
+        }
+
+        .typing-indicator.active {
+            display: block;
+        }
+
+        .typing-indicator::after {
+            content: '...';
+            animation: typingDots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes typingPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes typingDots {
+            0% { content: '.'; }
+            33% { content: '..'; }
+            66% { content: '...'; }
+            100% { content: ''; }
+        }
+
+        .user-panel {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            max-width: 200px;
+            background: var(--discord-darkest);
+            padding: 8px;
+            border-top-left-radius: 10px;
+            box-shadow: 0 -4px 16px var(--shadow-discord);
+            z-index: 100;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .user-panel .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .user-panel .user-info img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-panel .user-info .username {
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .user-panel .user-info .status {
+            font-size: 0.75em;
+            color: var(--text-muted);
+        }
+
+        .user-panel .controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .user-panel .control-btn {
+            flex: 1;
+            padding: 6px;
+            background: var(--discord-light-dark);
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-panel .control-btn:hover {
+            background: var(--discord-purple);
+        }
+
+        .user-panel .control-btn.active {
+            background: var(--discord-green);
+        }
+
+        .user-panel .settings {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .user-panel .settings select {
+            width: 100%;
+            padding: 6px;
+            background: var(--discord-light-dark);
+            border: none;
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 0.8em;
+            transition: all 0.3s ease;
+        }
+
+        .user-panel .settings select:hover {
+            background: var(--discord-purple);
+        }
+
+        .context-menu {
+            position: fixed;
+            background: var(--discord-darker);
+            border-radius: 5px;
+            box-shadow: 0 4px 16px var(--shadow-discord);
+            z-index: 3000;
+            display: none;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .context-menu.active {
+            display: block;
+        }
+
+        .context-menu .menu-item {
+            padding: 6px 10px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: all 0.3s ease;
+        }
+
+        .context-menu .menu-item:hover {
+            background: var(--discord-light-dark);
+        }
+
+        .context-menu .menu-item.reaction img {
+            width: 18px;
+            height: 18px;
+            margin-right: 4px;
+        }
+
+        @media (min-width: 768px) {
+            html, body {
+                font-size: 16px;
+            }
+            .discord-ui-wrapper {
+                flex-direction: row;
+            }
+            .server-list {
+                width: 64px;
+                height: 100%;
+                flex-direction: column;
+                padding: 10px 0;
+            }
+            .server-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 1.2em;
+            }
+            .channel-sidebar {
+                width: 220px;
+                height: 100%;
+            }
+            .channel-sidebar.active {
+                height: 100%;
+            }
+            .message-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 1em;
+            }
+            .message-header .username {
+                font-size: 0.9em;
+            }
+            .message-text {
+                font-size: 0.85em;
+            }
+            .chat-header-main {
+                padding: 10px 14px;
+            }
+            .chat-header-main h2 {
+                font-size: 1.1em;
+            }
+            .message-input-area {
+                padding: 10px 14px;
+            }
+            .tag-suggestions {
+                width: 240px;
+                left: 50%;
+                transform: translateX(-50%);
+                bottom: 50px;
+            }
+            .user-panel {
+                width: 240px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .server-list {
+                height: 44px;
+            }
+            .server-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 0.9em;
+            }
+            .channel-sidebar.active {
+                height: 50vh;
+            }
+            .message-input-area {
+                padding: 6px 8px;
+            }
+            .message-input-wrapper {
+                padding: 5px 6px;
+            }
+            .send-button {
+                padding: 5px 8px;
+                font-size: 0.75em;
+            }
+            .user-panel {
+                max-width: 100%;
+                padding: 6px;
+            }
+            .user-panel .user-info img {
+                width: 24px;
+                height: 24px;
+            }
+            .user-panel .controls {
+                gap: 6px;
+            }
+            .user-panel .control-btn {
+                padding: 5px;
+            }
+        }
+    </style>
+</head>
+<body class="loaded">
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-container">
+            <h2>Hoş Geldiniz!</h2>
+            <p>Guild Hub deneyimine başlamak için Discord ile giriş yapın.</p>
+            <button onclick="window.location.href='https://discord.com/oauth2/authorize?client_id=1319013720822906941&response_type=code&redirect_uri=https%3A%2F%2Fguildhub.vercel.app%2Fcallback&scope=identify%20guilds'">Discord ile Giriş Yap</button>
+        </div>
+    </div>
+
+    <div class="discord-ui-wrapper" id="discordUI" style="display: none;">
+        <div class="server-list" id="serverList"></div>
+
+        <div class="channel-sidebar" id="channelSidebar">
+            <div class="guild-header">
+                <h3 id="guildName">Guild Hub</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="channel-list" id="channelList"></div>
+        </div>
+
+        <div class="main-content">
+            <div class="chat-header-main">
+                <i class="fas fa-hashtag"></i>
+                <h2 id="currentChannelName">genel-sohbet</h2>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Mesaj ara">
+                </div>
+                <i class="fas fa-bars toggle-sidebar"></i>
+            </div>
+            <div class="message-area" id="messageArea">
+                <div class="typing-indicator" id="typingIndicator">GuildHubBot yazıyor...</div>
+            </div>
+            <div class="message-input-area">
+                <div class="message-input-wrapper">
+                    <i class="fas fa-plus input-icon"></i>
+                    <input type="text" id="messageInput" placeholder="Mesaj gönder">
+                    <i class="fas fa-face-smile input-icon"></i>
+                    <button class="send-button" id="sendButton">Gönder</button>
+                    <div class="tag-suggestions" id="tagSuggestions"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="user-panel" id="userPanel">
+            <div class="user-info">
+                <img src="https://via.placeholder.com/24" id="userAvatar" alt="User Avatar">
+                <div>
+                    <div class="username" id="userPanelUsername">Kullanıcı</div>
+                    <div class="status" id="userPanelStatus">Çevrimiçi</div>
+                </div>
+            </div>
+            <div class="controls">
+                <div class="control-btn mic active" id="micControl"><i class="fas fa-microphone"></i></div>
+                <div class="control-btn speaker active" id="speakerControl"><i class="fas fa-headphones"></i></div>
+            </div>
+            <div class="settings">
+                <select id="backgroundSelect">
+                    <option value="1">Doğal Manzara</option>
+                    <option value="2">Dağ Manzarası</option>
+                    <option value="3">Mor-Mavi Gradient</option>
+                    <option value="4">Gece Gökyüzü</option>
+                    <option value="5">Kırmızı-Siyah Gradient</option>
+                </select>
+                <select id="themeSelect">
+                    <option value="dark">Koyu Tema</option>
+                    <option value="light">Açık Tema</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-modal" id="profileModal">
+        <i class="fas fa-times close" id="closeProfileModal"></i>
+        <h3>Kullanıcı Ayarları</h3>
+        <div class="tabs">
+            <div class="tab active" data-tab="profile">Profil</div>
+            <div class="tab" data-tab="security">Güvenlik</div>
+        </div>
+        <div class="tab-content active" id="profileTab">
+            <div class="form-group">
+                <label for="profileUsername">Kullanıcı Adı</label>
+                <input type="text" id="profileUsername" readonly>
+            </div>
+            <div class="form-group">
+                <label for="profileAvatar">Profil Fotoğrafı</label>
+                <img src="https://via.placeholder.com/60" id="avatarPreview" class="avatar-preview" alt="Avatar Preview">
+                <input type="file" id="profileAvatar" accept="image/*">
+            </div>
+            <div class="form-group">
+                <label for="profileBio">Biyografi</label>
+                <textarea id="profileBio" placeholder="Biyografinizi girin"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="profileStatus">Durum</label>
+                <input type="text" id="profileStatus" placeholder="Çevrimiçi, Çevrimdışı, Meşgul vb.">
+            </div>
+            <button id="saveProfile">Profili Kaydet</button>
+        </div>
+        <div class="tab-content" id="securityTab">
+            <div class="form-group">
+                <label for="newPassword">Yeni Şifre</label>
+                <input type="password" id="newPassword" placeholder="Yeni şifre">
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Şifreyi Onayla</label>
+                <input type="password" id="confirmPassword" placeholder="Şifreyi tekrar gir">
+            </div>
+            <button id="saveSecurity">Güvenlik Ayarlarını Kaydet</button>
+        </div>
+    </div>
+
+    <div class="context-menu" id="contextMenu">
+        <div class="menu-item reaction" data-action="react" data-reaction="😄"><img src="https://cdn.jsdelivr.net/npm/emoji-datasource@7.0.2/img/twitter/64/1f604.png"> Tepki Ekle (😄)</div>
+        <div class="menu-item reaction" data-action="react" data-reaction="👍"><img src="https://cdn.jsdelivr.net/npm/emoji-datasource@7.0.2/img/twitter/64/1f44d.png"> Tepki Ekle (👍)</div>
+        <div class="menu-item" data-action="copy">Mesajı Kopyala</div>
+        <div class="menu-item" data-action="delete">Mesajı Sil</div>
+    </div>
+
+    <i class="fas fa-sun theme-toggle" id="themeToggle"></i>
+    <div class="notification" id="notification"></div>
+
+    <script>
+        const authOverlay = document.getElementById('authOverlay');
+        const discordUI = document.getElementById('discordUI');
+        const serverList = document.getElementById('serverList');
+        const channelSidebar = document.getElementById('channelSidebar');
+        const channelList = document.getElementById('channelList');
+        const guildName = document.getElementById('guildName');
+        const messageArea = document.getElementById('messageArea');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const currentChannelNameDisplay = document.getElementById('currentChannelName');
+        const searchInput = document.getElementById('searchInput');
+        const themeToggle = document.getElementById('themeToggle');
+        const notification = document.getElementById('notification');
+        const tagSuggestions = document.getElementById('tagSuggestions');
+        const profileModal = document.getElementById('profileModal');
+        const closeProfileModal = document.getElementById('closeProfileModal');
+        const profileUsername = document.getElementById('profileUsername');
+        const profileBio = document.getElementById('profileBio');
+        const profileStatus = document.getElementById('profileStatus');
+        const saveProfile = document.getElementById('saveProfile');
+        const profileAvatar = document.getElementById('profileAvatar');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const newPassword = document.getElementById('newPassword');
+        const confirmPassword = document.getElementById('confirmPassword');
+        const saveSecurity = document.getElementById('saveSecurity');
+        const userPanel = document.getElementById('userPanel');
+        const userAvatar = document.getElementById('userAvatar');
+        const userPanelUsername = document.getElementById('userPanelUsername');
+        const userPanelStatus = document.getElementById('userPanelStatus');
+        const micControl = document.getElementById('micControl');
+        const speakerControl = document.getElementById('speakerControl');
+        const backgroundSelect = document.getElementById('backgroundSelect');
+        const themeSelect = document.getElementById('themeSelect');
+        const contextMenu = document.getElementById('contextMenu');
+
+        let currentUser = null;
+        let currentGuild = null;
+        let currentChannel = null;
+        let isSidebarActive = false;
+        let isLightTheme = false;
+        let messageIdCounter = 0;
+        let isMicOn = true;
+        let isSpeakerOn = true;
+        let touchStartTime = 0;
+        let touchTimeout;
+        let accessToken = null;
+
+        let userProfiles = {};
+        let guildData = {};
+        let channelMessages = {};
+
+        const backgrounds = {
+            '1': 'url("https://images.unsplash.com/photo-1600585154340-be6161a56a0c")',
+            '2': 'url("https://images.unsplash.com/photo-1519681393784-d120267933ba")',
+            '3': 'linear-gradient(135deg, #2B2D31, #5865F2)',
+            '4': 'url("https://images.unsplash.com/photo-1477346611705-65d1883cee1e")',
+            '5': 'linear-gradient(135deg, #1E1F22, #F23F43)'
+        };
+
+        async function exchangeCodeForToken(code) {
+            try {
+                const response = await fetch('https://discord.com/api/oauth2/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        client_id: '1319013720822906941',
+                        client_secret: 'YOUR_CLIENT_SECRET', // Replace with your client secret
+                        grant_type: 'authorization_code',
+                        code: code,
+                        redirect_uri: 'https://guildhub.vercel.app/callback'
+                    })
+                });
+                const data = await response.json();
+                if (data.access_token) {
+                    accessToken = data.access_token;
+                    return data.access_token;
+                }
+                throw new Error('Token alınamadı');
+            } catch (error) {
+                console.error('Token exchange error:', error);
+                showNotification('Giriş başarısız, lütfen tekrar deneyin.');
+            }
+        }
+
+        async function fetchUserData(token) {
+            try {
+                const response = await fetch('https://discord.com/api/users/@me', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (data.id) {
+                    currentUser = {
+                        id: data.id,
+                        username: data.username,
+                        discriminator: data.discriminator,
+                        avatar: data.avatar ? `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png` : 'https://via.placeholder.com/80',
+                        status: 'Çevrimiçi'
+                    };
+                    userProfiles[data.id] = {
+                        bio: data.bio || 'Merhaba, ben yeni bir kullanıcıyım!',
+                        status: 'Çevrimiçi',
+                        avatar: currentUser.avatar
+                    };
+                    updateUserPanel();
+                }
+            } catch (error) {
+                console.error('User data fetch error:', error);
+                showNotification('Kullanıcı bilgileri alınamadı.');
+            }
+        }
+
+        async function fetchGuilds(token) {
+            try {
+                const response = await fetch('https://discord.com/api/users/@me/guilds', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const guilds = await response.json();
+                serverList.innerHTML = '';
+                guilds.forEach(guild => {
+                    guildData[guild.id] = guild;
+                    const serverIcon = document.createElement('div');
+                    serverIcon.classList.add('server-icon');
+                    serverIcon.dataset.guildId = guild.id;
+                    serverIcon.innerHTML = guild.icon
+                        ? `<img src="https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png" style="width: 100%; height: 100%; border-radius: 50%;">`
+                        : guild.name[0].toUpperCase();
+                    serverList.appendChild(serverIcon);
+                });
+                serverList.innerHTML += `
+                    <div class="server-icon add-server"><i class="fas fa-plus"></i></div>
+                `;
+                if (guilds.length > 0) {
+                    loadGuildChannels(guilds[0].id);
+                }
+            } catch (error) {
+                console.error('Guild fetch error:', error);
+                showNotification('Sunucular alınamadı.');
+            }
+        }
+
+        async function fetchGuildChannels(guildId) {
+            try {
+                const response = await fetch(`https://discord.com/api/guilds/${guildId}/channels`, {
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                });
+                const channels = await response.json();
+                channelList.innerHTML = '';
+                const textChannels = channels.filter(c => c.type === 0);
+                if (textChannels.length > 0) {
+                    channelList.innerHTML = `
+                        <div class="channel-category">
+                            <div class="category-header" data-category="text-channels">
+                                <i class="fas fa-chevron-right"></i> Metin Kanalları
+                            </div>
+                            <div class="category-content">
+                                ${textChannels.map(c => `
+                                    <div class="channel-item" data-channel-id="${c.id}">
+                                        <i class="fas fa-hashtag"></i> ${c.name}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    currentChannel = textChannels[0].id;
+                    currentChannelNameDisplay.textContent = `#${textChannels[0].name}`;
+                    guildName.textContent = guildData[guildId].name;
+                    loadChannelMessages(textChannels[0].id);
+                }
+            } catch (error) {
+                console.error('Channels fetch error:', error);
+                showNotification('Kanallar alınamadı.');
+            }
+        }
+
+        async function fetchChannelMessages(channelId) {
+            try {
+                const response = await fetch(`https://discord.com/api/channels/${channelId}/messages?limit=50`, {
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                });
+                const messages = await response.json();
+                channelMessages[channelId] = messages.reverse().map(msg => ({
+                    id: messageIdCounter++,
+                    sender: msg.author.id,
+                    username: msg.author.username,
+                    avatar: msg.author.avatar ? `https://cdn.discordapp.com/avatars/${msg.author.id}/${msg.author.avatar}.png` : 'https://via.placeholder.com/32',
+                    text: msg.content,
+                    timestamp: msg.timestamp,
+                    reactions: msg.reactions ? msg.reactions.map(r => ({
+                        emoji: r.emoji.name,
+                        count: r.count,
+                        users: []
+                    })) : [],
+                    isUser: msg.author.id === currentUser?.id
+                }));
+                loadChannelMessages(channelId);
+            } catch (error) {
+                console.error('Messages fetch error:', error);
+                showNotification('Mesajlar alınamadı.');
+            }
+        }
+
+        async function sendDiscordMessage(channelId, content) {
+            try {
+                const response = await fetch(`https://discord.com/api/channels/${channelId}/messages`, {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ content })
+                });
+                const msg = await response.json();
+                return msg;
+            } catch (error) {
+                console.error('Message send error:', error);
+                showNotification('Mesaj gönderilemedi.');
+            }
+        }
+
+        function showTypingIndicator() {
+            typingIndicator.classList.add('active');
+            messageArea.scrollTop = messageArea.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            typingIndicator.classList.remove('active');
+        }
+
+        function initApp() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            if (code) {
+                exchangeCodeForToken(code).then(token => {
+                    if (token) {
+                        fetchUserData(token);
+                        fetchGuilds(token);
+                        authOverlay.style.display = 'none';
+                        discordUI.style.display = 'flex';
+                        discordUI.style.backgroundImage = backgrounds['1'];
+                    }
+                });
+            } else {
+                authOverlay.style.display = 'flex';
+            }
+        }
+
+        function updateUserPanel() {
+            if (currentUser) {
+                userPanelUsername.textContent = currentUser.username;
+                userPanelStatus.textContent = userProfiles[currentUser.id]?.status || 'Çevrimiçi';
+                userAvatar.src = currentUser.avatar;
+            }
+        }
+
+        function toggleSidebar() {
+            isSidebarActive = !isSidebarActive;
+            channelSidebar.classList.toggle('active', isSidebarActive);
+            const toggleIcon = document.querySelector('.toggle-sidebar');
+            toggleIcon.classList.toggle('fa-bars', !isSidebarActive);
+            toggleIcon.classList.toggle('fa-times', isSidebarActive);
+        }
+
+        function loadChannelMessages(channelId) {
+            searchInput.value = '';
+            while (messageArea.firstChild && messageArea.firstChild !== typingIndicator) {
+                messageArea.removeChild(messageArea.firstChild);
+            }
+            const messages = channelMessages[channelId] || [];
+            messages.forEach(msg => addMessage(msg));
+            messageArea.scrollTop = messageArea.scrollHeight;
+        }
+
+        function addMessage(message) {
+            const messageItem = document.createElement('div');
+            messageItem.classList.add('message-item');
+            messageItem.dataset.id = message.id;
+
+            const avatarSrc = message.avatar || 'https://via.placeholder.com/32';
+            let avatarBg = message.sender === currentUser?.id ? 'var(--discord-green)' :
+                          message.username === 'GuildHubBot' ? 'var(--gradient-accent)' :
+                          message.username.includes('Moderator') ? 'var(--discord-red)' : 'var(--discord-blue)';
+
+            messageItem.innerHTML = `
+                <img class="message-avatar" src="${avatarSrc}" style="background: ${avatarBg};">
+                <div class="message-content-wrapper">
+                    <div class="message-header">
+                        <span class="username" style="color: ${avatarBg === 'var(--gradient-accent)' ? 'var(--discord-purple)' : avatarBg};" data-username="${message.sender}">${message.username}</span>
+                        <span class="timestamp">${new Date(message.timestamp).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                    <div class="message-text">${message.text}</div>
+                    <div class="reactions">
+                        ${message.reactions?.map(r => `<span class="reaction ${r.users.includes(currentUser?.id) ? 'active' : ''}" data-reaction="${r.emoji}">${r.emoji} ${r.count}</span>`).join('') || ''}
+                    </div>
+                </div>
+            `;
+            if (typingIndicator.parentNode === messageArea) {
+                messageArea.insertBefore(messageItem, typingIndicator);
+            } else {
+                messageArea.appendChild(messageItem);
+            }
+        }
+
+        function showTagSuggestions(input) {
+            tagSuggestions.innerHTML = '';
+            if (input.startsWith('@')) {
+                const query = input.slice(1).toLowerCase();
+                const filteredUsers = Object.values(userProfiles).filter(user => user.username.toLowerCase().startsWith(query));
+                filteredUsers.forEach(user => {
+                    const suggestion = document.createElement('div');
+                    suggestion.classList.add('tag-suggestion');
+                    suggestion.textContent = user.username;
+                    suggestion.addEventListener('click', () => {
+                        messageInput.value = `@${user.username} `;
+                        tagSuggestions.classList.remove('active');
+                        messageInput.focus();
+                    });
+                    tagSuggestions.appendChild(suggestion);
+                });
+                tagSuggestions.classList.toggle('active', filteredUsers.length > 0);
+            } else {
+                tagSuggestions.classList.remove('active');
+            }
+        }
+
+        function showProfile(userId) {
+            profileUsername.value = userProfiles[userId]?.username || '';
+            profileBio.value = userProfiles[userId]?.bio || '';
+            profileStatus.value = userProfiles[userId]?.status || 'Çevrimiçi';
+            avatarPreview.src = userProfiles[userId]?.avatar || 'https://via.placeholder.com/60';
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelector('.tab[data-tab="profile"]').classList.add('active');
+            document.getElementById('profileTab').classList.add('active');
+            profileModal.classList.add('active');
+        }
+
+        function saveProfileData() {
+            if (currentUser) {
+                userProfiles[currentUser.id] = {
+                    username: currentUser.username,
+                    bio: profileBio.value,
+                    status: profileStatus.value,
+                    avatar: userProfiles[currentUser.id]?.avatar || 'https://via.placeholder.com/60'
+                };
+                updateUserPanel();
+                showNotification('Profil kaydedildi!');
+                profileModal.classList.remove('active');
+            }
+        }
+
+        function saveSecurityData() {
+            if (newPassword.value !== confirmPassword.value) {
+                showNotification('Şifreler eşleşmiyor!');
+                return;
+            }
+            showNotification('Şifre değiştirildi!');
+            profileModal.classList.remove('active');
+        }
+
+        async function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (!messageText) {
+                showNotification('Mesaj boş olamaz!');
+                return;
+            }
+
+            const message = await sendDiscordMessage(currentChannel, messageText);
+            if (message) {
+                channelMessages[currentChannel].push({
+                    id: messageIdCounter++,
+                    sender: currentUser.id,
+                    username: currentUser.username,
+                    avatar: currentUser.avatar,
+                    text: messageText,
+                    timestamp: new Date().toISOString(),
+                    reactions: [],
+                    isUser: true
+                });
+                addMessage({
+                    id: messageIdCounter - 1,
+                    sender: currentUser.id,
+                    username: currentUser.username,
+                    avatar: currentUser.avatar,
+                    text: messageText,
+                    timestamp: new Date().toISOString(),
+                    reactions: [],
+                    isUser: true
+                });
+                messageInput.value = '';
+                tagSuggestions.classList.remove('active');
+                showNotification('Mesaj gönderildi!');
+                messageArea.scrollTop = messageArea.scrollHeight;
+            }
+        }
+
+        function showContextMenu(x, y, messageId) {
+            contextMenu.style.left = `${x}px`;
+            contextMenu.style.top = `${y}px`;
+            contextMenu.dataset.messageId = messageId;
+            contextMenu.classList.add('active');
+        }
+
+        function hideContextMenu() {
+            contextMenu.classList.remove('active');
+        }
+
+        function handleContextMenuAction(action, messageId, reaction = null) {
+            const messages = channelMessages[currentChannel];
+            const message = messages.find(msg => msg.id === parseInt(messageId));
+            if (!message) return;
+
+            if (action === 'react') {
+                let reactionObj = message.reactions.find(r => r.emoji === reaction);
+                if (!reactionObj) {
+                    reactionObj = { emoji: reaction, count: 0, users: [] };
+                    message.reactions.push(reactionObj);
+                }
+                if (!reactionObj.users.includes(currentUser.id)) {
+                    reactionObj.count++;
+                    reactionObj.users.push(currentUser.id);
+                } else {
+                    reactionObj.count--;
+                    reactionObj.users = reactionObj.users.filter(u => u !== currentUser.id);
+                }
+                if (reactionObj.count === 0) {
+                    message.reactions = message.reactions.filter(r => r.emoji !== reaction);
+                }
+                loadChannelMessages(currentChannel);
+                showNotification(`Tepki ${reactionObj.users.includes(currentUser.id) ? 'eklendi' : 'kaldırıldı'}!`);
+            } else if (action === 'copy') {
+                navigator.clipboard.writeText(message.text);
+                showNotification('Mesaj kopyalandı!');
+            } else if (action === 'delete' && message.isUser) {
+                channelMessages[currentChannel] = messages.filter(msg => msg.id !== parseInt(messageId));
+                loadChannelMessages(currentChannel);
+                showNotification('Mesaj silindi!');
+            }
+            hideContextMenu();
+        }
+
+        discordUI.addEventListener('click', (e) => {
+            const target = e.target.closest('.server-icon, .channel-item, .toggle-sidebar, .category-header, .input-icon, .username, .send-button, .tab, .control-btn, .reaction');
+            if (!target) return;
+
+            if (target.classList.contains('toggle-sidebar')) {
+                toggleSidebar();
+            } else if (target.classList.contains('category-header')) {
+                const content = target.nextElementSibling;
+                content.classList.toggle('hidden');
+                target.classList.toggle('collapsed');
+            } else if (target.classList.contains('channel-item')) {
+                document.querySelector('.channel-item.active')?.classList.remove('active');
+                target.classList.add('active');
+                currentChannel = target.dataset.channelId;
+                currentChannelNameDisplay.textContent = `#${target.textContent.trim().slice(1)}`;
+                fetchChannelMessages(currentChannel);
+                toggleSidebar();
+            } else if (target.classList.contains('server-icon') && target.dataset.guildId) {
+                document.querySelector('.server-icon.active')?.classList.remove('active');
+                target.classList.add('active');
+                currentGuild = target.dataset.guildId;
+                fetchGuildChannels(currentGuild);
+            } else if (target.classList.contains('input-icon') && target.classList.contains('fa-face-smile')) {
+                showNotification('Emoji seçici açıldı!');
+            } else if (target.classList.contains('username')) {
+                showProfile(target.dataset.username);
+            } else if (target.classList.contains('tab')) {
+                document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                target.classList.add('active');
+                document.getElementById(`${target.dataset.tab}Tab`).classList.add('active');
+            } else if (target.classList.contains('control-btn')) {
+                if (target.classList.contains('mic')) {
+                    isMicOn = !isMicOn;
+                    target.classList.toggle('active', isMicOn);
+                    target.innerHTML = `<i class="fas fa-microphone${isMicOn ? '' : '-slash'}"></i>`;
+                    showNotification(`Mikrofon ${isMicOn ? 'açık' : 'kapalı'}`);
+                } else if (target.classList.contains('speaker')) {
+                    isSpeakerOn = !isSpeakerOn;
+                    target.classList.toggle('active', הט
+
+System: You are Grok 3 built by xAI.
+
+It looks like the code was cut off. I'll provide a complete, mobile-optimized version of the `index.html` file that integrates Discord OAuth2 authentication, fetches user data, guilds, channels, and messages, and ensures the message input area is visible and functional on mobile devices. The code includes improved styling for mobile responsiveness and a streamlined interface.
+
+```html
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Guild Hub - Discord Simülasyonu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Whitney:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        :root {
+            --discord-darkest: #1E1F22;
+            --discord-darker: #2B2D31;
+            --discord-dark: #313338;
+            --discord-light-dark: #383A40;
+            --discord-purple: #5865F2;
+            --discord-green: #57F287;
+            --discord-red: #F23F43;
+            --discord-blue: #00AFF4;
+            --text-primary: #DBDEE1;
+            --text-secondary: #949BA4;
+            --text-muted: #6A6D73;
+            --border-subtle: rgba(70, 70, 70, 0.3);
+            --shadow-discord: rgba(0, 0, 0, 0.4);
+            --gradient-accent: linear-gradient(45deg, #5865F2, #8B5CF6);
+            --glow-effect: 0 0 10px rgba(88, 101, 242, 0.5);
+            --light-bg: #F2F3F5;
+            --light-text: #2E3338;
+            --light-secondary: #4F5660;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Whitney', 'Inter', sans-serif;
+            background: var(--discord-darkest);
+            color: var(--text-primary);
+            touch-action: manipulation;
+            font-size: 14px;
+            transition: background 0.5s ease;
+        }
+
+        body.light-theme {
+            background: var(--light-bg);
+            color: var(--light-text);
+            --discord-darkest: #E3E5E8;
+            --discord-darker: #ECEDEE;
+            --discord-dark: #F2F3F5;
+            --discord-light-dark: #FFFFFF;
+            --text-primary: var(--light-text);
+            --text-secondary: var(--light-secondary);
+            --text-muted: #747F8D;
+        }
+
+        body.loaded {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top left, #5865f244, transparent 70%),
+                        radial-gradient(circle at bottom right, #f23f4344, transparent 70%),
+                        var(--discord-darkest);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeAndZoomIn 1s ease-out;
+        }
+
+        @keyframes fadeAndZoomIn {
+            0% { opacity: 0; transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .auth-container {
+            background: var(--discord-dark);
+            border-radius: 12px;
+            padding: 20px;
+            width: 90%;
+            max-width: 360px;
+            text-align: center;
+            box-shadow: 0 8px 32px var(--shadow-discord);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            0% { transform: translateY(50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .auth-container h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .auth-container p {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .auth-container button {
+            width: 100%;
+            padding: 10px;
+            background: var(--gradient-accent);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-container button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.4s ease;
+        }
+
+        .auth-container button:hover::after {
+            width: 200px;
+            height: 200px;
+        }
+
+        .auth-container button:hover {
+            background: linear-gradient(45deg, #4752C4, #7C3AED);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: var(--glow-effect);
+        }
+
+        .discord-ui-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-size: cover;
+            background-position: center;
+            transition: background 0.5s ease;
+        }
+
+        .server-list {
+            width: 100%;
+            height: 48px;
+            background: var(--discord-darkest);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            flex-shrink: 0;
+            transition: background 0.3s ease;
+        }
+
+        .server-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .server-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--discord-light-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1em;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px var(--shadow-discord);
+            position: relative;
+        }
+
+        .server-icon img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .server-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .server-icon:hover::before {
+            opacity: 1;
+        }
+
+        .server-icon.active {
+            border-radius: 12px;
+            background: var(--gradient-accent);
+            transform: scale(1.1);
+        }
+
+        .server-icon:hover:not(.active) {
+            border-radius: 12px;
+            transform: scale(1.1);
+        }
+
+        .server-icon.add-server {
+            background: var(--discord-dark);
+            color: var(--discord-green);
+        }
+
+        .server-icon.add-server:hover {
+            background: var(--discord-green);
+            color: var(--text-primary);
+        }
+
+        .channel-sidebar {
+            width: 100%;
+            height: 0;
+            background: var(--discord-darker);
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .channel-sidebar.active {
+            height: 45vh;
+        }
+
+        .guild-header {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .guild-header h3 {
+            font-size: 1em;
+            font-weight: 700;
+        }
+
+        .guild-header i {
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .guild-header i:hover {
+            color: var(--text-primary);
+            transform: rotate(90deg);
+        }
+
+        .channel-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 8px;
+            scrollbar-width: thin;
+        }
+
+        .channel-list::-webkit-scrollbar { width: 5px; }
+        .channel-list::-webkit-scrollbar-track { background: var(--discord-darker); }
+        .channel-list::-webkit-scrollbar-thumb { background-color: var(--discord-light-dark); border-radius: 3px; }
+
+        .channel-category {
+            margin-bottom: 12px;
+        }
+
+        .category-header {
+            font-size: 0.75em;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding: 6px 8px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-header:hover {
+            color: var(--text-primary);
+        }
+
+        .category-header.collapsed i {
+            transform: rotate(-90deg);
+        }
+
+        .category-content {
+            display: block;
+            transition: max-height 0.4s ease;
+        }
+
+        .category-content.hidden {
+            display: none;
+        }
+
+        .channel-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+            margin-bottom: 2px;
+            border-radius: 4px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .channel-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(88, 101, 242, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .channel-item:hover::after {
+            left: 100%;
+        }
+
+        .channel-item:hover {
+            background: var(--discord-light-dark);
+            color: var(--text-primary);
+        }
+
+        .channel-item.active {
+            background: var(--gradient-accent);
+            color: var(--text-primary);
+        }
+
+        .channel-item i {
+            font-size: 0.9em;
+            width: 16px;
+            text-align: center;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            background: var(--discord-dark);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header-main {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: var(--discord-dark);
+            border-bottom: 1px solid var(--border-subtle);
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px var(--shadow-discord);
+            transition: all 0.3s ease;
+        }
+
+        .chat-header-main:hover {
+            background: var(--discord-light-dark);
+        }
+
+        .chat-header-main i {
+            margin-right: 8px;
+            font-size: 1.2em;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .chat-header-main i:hover {
+            color: var(--text-primary);
+        }
+
+        .chat-header-main h2 {
+            font-size: 1em;
+            font-weight: 700;
+            flex-grow: 1;
+        }
+
+        .chat-header-main .search-bar {
+            display: flex;
+            align-items: center;
+            background: var(--discord-light-dark);
+            border-radius: 4px;
+            padding: 4px 8px;
+            transition: all 0.3s ease;
+        }
+
+        .chat-header-main .search-bar:hover {
+            background: var(--discord-dark);
+        }
+
+        .chat-header-main .search-bar input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 0.8em;
+            width: 80px;
+        }
+
+        .chat-header-main .toggle-sidebar {
+            margin-left: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .chat-header-main .toggle-sidebar:hover {
+            color: var(--text-primary);
+        }
+
+        .message-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            scrollbar-width: thin;
+            touch-action: pan-y;
+        }
+
+        .message-area::-webkit-scrollbar { width: 5px; }
+        .message-area::-webkit-scrollbar-track { background: var(--discord-dark); }
+        .message-area::-webkit-scrollbar-thumb { background-color: var(--discord-light-dark); border-radius: 3px; }
+
+        .message-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 5px 0;
+            animation: messageFadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .message-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .message-item:hover::before {
+            left: 100%;
+        }
+
+        @keyframes messageFadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--discord-blue);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9em;
+            color: var(--text-primary);
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            object-fit: cover;
+        }
+
+        .message-avatar:hover {
+            transform: scale(1.1);
+        }
