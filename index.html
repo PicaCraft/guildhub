@@ -1,1316 +1,886 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>GuildHub - Discord Tag Archive</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --bg: #0a0a23;
-            --primary: #7c3aed;
-            --secondary: #ec4899;
-            --btn: #6d28d9;
-            --text: #ffffff;
-            --muted: #9ca3af;
-            --card-bg: #171717;
-            --nav-height: 64px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.3);
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuildHub Developer Portal | guildhub.online</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        },
+                        guildhub: {
+                            DEFAULT: '#6d28d9',
+                            dark: '#4c1d95',
+                            light: '#8b5cf6',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'gradient-x': 'gradient-x 8s ease infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        'gradient-x': {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center',
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center',
+                            },
+                        },
+                        'float': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                    },
+                },
+            },
         }
-
-        [data-theme="dark"] {
-            --bg: #0a0a23;
-            --primary: #7c3aed;
-            --secondary: #ec4899;
-            --btn: #6d28d9;
-            --text: #ffffff;
-            --muted: #9ca3af;
-            --card-bg: #171717;
+    </script>
+    <style type="text/css">
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            background-image: linear-gradient(90deg, #8b5cf6, #c4b5fd, #8b5cf6);
         }
-
-        [data-theme="light"] {
-            --bg: #f9fafb;
-            --primary: #6d28d9;
-            --secondary: #db2777;
-            --btn: #7c3aed;
-            --text: #1f2937;
-            --muted: #6b7280;
-            --card-bg: #ffffff;
+        
+        .code-block {
+            background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 100%);
+            border: 1px solid rgba(124, 58, 237, 0.3);
         }
-
-        [data-theme="cyberpunk"] {
-            --bg: #0f0f1a;
-            --primary: #ff2a6d;
-            --secondary: #05d9e8;
-            --btn: #ff2a6d;
-            --text: #e0f7fa;
-            --muted: #94a3b8;
-            --card-bg: #1e1e2e;
+        
+        .glow-effect {
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            scroll-behavior: smooth;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-            line-height: 1.5;
-            overflow-x: hidden;
-            transition: var(--transition);
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 clamp(16px, 5vw, 32px);
-            height: var(--nav-height);
-            background: rgba(10, 10, 35, 0.95);
-            backdrop-filter: blur(12px);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            box-shadow: var(--shadow);
-        }
-
-        .logo {
-            font-size: clamp(1.25rem, 4vw, 1.5rem);
-            font-weight: 700;
-            color: var(--text);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .logo i {
-            color: var(--primary);
-            font-size: 1.5rem;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: clamp(16px, 3vw, 24px);
-        }
-
-        .nav-links a {
-            color: var(--text);
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
+        
+        .nav-link {
             position: relative;
-            transition: var(--transition);
         }
-
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-
-        .nav-links a::after {
+        
+        .nav-link::after {
             content: '';
             position: absolute;
+            bottom: -2px;
+            left: 0;
             width: 0;
             height: 2px;
-            background: var(--primary);
-            bottom: -4px;
-            left: 0;
-            transition: var(--transition);
+            background: #8b5cf6;
+            transition: width 0.3s ease;
         }
-
-        .nav-links a:hover::after {
+        
+        .nav-link:hover::after {
             width: 100%;
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .hamburger {
-            display: none;
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: var(--text);
-            font-size: 1.5rem;
-            padding: 8px;
-        }
-
-        .mobile-menu {
-            position: fixed;
-            top: var(--nav-height);
-            left: 0;
-            width: 100%;
-            background: var(--bg);
-            padding: 24px;
-            box-shadow: var(--shadow);
-            transform: translateY(-100%);
-            transition: transform 0.3s ease;
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .mobile-menu.active {
-            transform: translateY(0);
-        }
-
-        .mobile-menu .nav-links {
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .mobile-menu .nav-buttons {
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .language-selector {
-            position: relative;
-        }
-
-        .language-btn {
-            background: none;
-            border: none;
-            color: var(--text);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            padding: 8px;
-            border-radius: 6px;
-            transition: var(--transition);
-        }
-
-        .language-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .language-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 12px;
-            box-shadow: var(--shadow);
-            display: none;
-            min-width: 140px;
-            z-index: 100;
-        }
-
-        .language-dropdown.active {
-            display: block;
-        }
-
-        .language-dropdown a {
-            display: flex;
-            align-items: center;
-            padding: 8px 12px;
-            color: var(--text);
-            text-decoration: none;
-            font-size: 0.9rem;
-            border-radius: 6px;
-            transition: var(--transition);
-        }
-
-        .language-dropdown a:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .theme-switcher {
-            position: relative;
-        }
-
-        .theme-btn {
-            background: none;
-            border: none;
-            color: var(--text);
-            cursor: pointer;
-            font-size: 1.2rem;
-            padding: 8px;
-            border-radius: 6px;
-            transition: var(--transition);
-        }
-
-        .theme-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .theme-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 12px;
-            box-shadow: var(--shadow);
-            display: none;
-            min-width: 140px;
-            z-index: 100;
-        }
-
-        .theme-dropdown.active {
-            display: block;
-        }
-
-        .theme-dropdown button {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            padding: 8px 12px;
-            background: none;
-            border: none;
-            color: var(--text);
-            font-size: 0.9rem;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .theme-dropdown button:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .container {
-            text-align: center;
-            padding: clamp(80px, 15vw, 120px) 16px 80px;
-            max-width: 1280px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 2;
-        }
-
-        .background-blobs {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 0;
-            overflow: hidden;
-        }
-
-        .blob {
-            position: absolute;
-            width: clamp(200px, 20vw, 300px);
-            height: clamp(200px, 20vw, 300px);
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 50%;
-            animation: float 15s infinite ease-in-out alternate;
-            filter: blur(50px);
-            opacity: 0.6;
-        }
-
-        .blob:nth-child(1) { top: 10%; left: 10%; }
-        .blob:nth-child(2) { top: 50%; left: 75%; animation-delay: 4s; }
-        .blob:nth-child(3) { top: 80%; left: 25%; animation-delay: 8s; }
-
-        @keyframes float {
-            0% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-30px) scale(1.05); }
-            100% { transform: translateY(0) scale(1); }
-        }
-
-        h1 {
-            font-size: clamp(2rem, 6vw, 3.5rem);
-            font-weight: 800;
-            margin-bottom: 16px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: gradientShift 6s ease infinite;
-            background-size: 200% 200%;
-            line-height: 1.2;
-        }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        p.subtitle {
-            font-size: clamp(1rem, 3vw, 1.2rem);
-            color: var(--muted);
-            margin-bottom: 32px;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-            line-height: 1.6;
-            word-break: break-word;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, var(--btn), var(--primary));
-            padding: clamp(12px, 2vw, 14px) clamp(24px, 4vw, 28px);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-size: clamp(0.9rem, 2.5vw, 1rem);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-        }
-
-        .btn::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: rgba(255, 255, 255, 0.15);
-            transform: rotate(45deg);
-            transition: var(--transition);
-            opacity: 0;
-        }
-
-        .btn:hover::after {
-            opacity: 1;
-            animation: shine 1.2s ease;
-        }
-
-        @keyframes shine {
-            0% { left: -50%; }
-            100% { left: 150%; }
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            box-shadow: none;
-        }
-
-        .btn-outline:hover {
-            background: var(--primary);
-            color: white;
-            box-shadow: var(--shadow);
-        }
-
-        .search-box {
-            margin: 48px auto;
-            max-width: 600px;
-            display: flex;
-            align-items: center;
-            background: var(--card-bg);
-            padding: clamp(12px, 2vw, 16px);
-            border-radius: 50px;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: var(--transition);
-        }
-
-        .search-box:hover {
-            box-shadow: var(--shadow-hover);
-            border-color: var(--primary);
-        }
-
-        .search-box input {
-            background: transparent;
-            border: none;
-            outline: none;
-            flex: 1;
-            color: var(--text);
-            font-size: clamp(0.9rem, 2.5vw, 1rem);
-            padding: 8px;
-            width: 100%;
-        }
-
-        .search-box svg {
-            fill: var(--primary);
-            width: 20px;
-            height: 20px;
-            margin: 0 12px;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 32px;
-            margin-top: 48px;
-        }
-
-        .feature {
-            background: var(--card-bg);
-            padding: 24px;
-            border-radius: 16px;
-            text-align: center;
-            transition: var(--transition);
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            animation: fadeInUp 0.8s ease forwards;
-        }
-
-        .feature:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .feature svg {
-            width: 48px;
-            height: 48px;
-            fill: var(--primary);
-            margin-bottom: 16px;
-        }
-
-        .feature h3 {
-            font-size: clamp(1.1rem, 3vw, 1.3rem);
-            margin-bottom: 12px;
-            color: var(--text);
-        }
-
-        .feature p {
-            color: var(--muted);
-            font-size: clamp(0.9rem, 2.5vw, 1rem);
-            line-height: 1.6;
-            word-break: break-word;
-        }
-
-        @keyframes fadeInUp {
-            0% { opacity: 0; transform: translateY(16px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        .premium-section {
-            margin-top: 80px;
-            padding: clamp(48px, 10vw, 64px) 16px;
-            background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(236, 72, 153, 0.15));
-            border-radius: 24px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .premium-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
-            opacity: 0.6;
-        }
-
-        .premium-content {
-            position: relative;
-            z-index: 2;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .premium-title {
-            font-size: clamp(1.8rem, 5vw, 2.5rem);
-            margin-bottom: 16px;
-            color: var(--text);
-        }
-
-        .premium-subtitle {
-            font-size: clamp(1rem, 3vw, 1.2rem);
-            color: var(--muted);
-            margin-bottom: 40px;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-            line-height: 1.6;
-        }
-
-        .premium-plans {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-            margin-top: 32px;
-        }
-
-        .plan {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 32px;
-            transition: var(--transition);
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-        }
-
-        .plan:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .plan.popular {
-            border: 2px solid var(--primary);
-            background: linear-gradient(135deg, var(--card-bg), rgba(124, 58, 237, 0.1));
-        }
-
-        .popular-badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: var(--primary);
-            color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .plan-name {
-            font-size: clamp(1.3rem, 3.5vw, 1.5rem);
-            margin-bottom: 16px;
-            color: var(--primary);
-        }
-
-        .plan-price {
-            font-size: clamp(2rem, 5vw, 2.5rem);
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .plan-period {
-            font-size: clamp(0.9rem, 2.5vw, 1rem);
-            color: var(--muted);
-            margin-bottom: 24px;
-        }
-
-        .plan-features {
-            margin-bottom: 24px;
-            text-align: left;
-        }
-
-        .plan-feature {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-            font-size: clamp(0.9rem, 2.5vw, 0.95rem);
-            color: var(--text);
-        }
-
-        .plan-feature i {
-            color: var(--primary);
-            margin-right: 12px;
-            font-size: 1rem;
-        }
-
-        .plan-btn {
-            width: 100%;
-            padding: 12px;
-            font-weight: 600;
-        }
-
-        footer {
-            background: rgba(10, 10, 35, 0.95);
-            padding: clamp(32px, 8vw, 48px) clamp(16px, 5vw, 32px);
-            margin-top: 80px;
-            backdrop-filter: blur(12px);
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 32px;
-            max-width: 1280px;
-            margin: 0 auto;
-        }
-
-        .footer-column {
-            min-width: 160px;
-        }
-
-        .footer-logo {
-            font-size: clamp(1.3rem, 3.5vw, 1.5rem);
-            font-weight: 700;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text);
-            text-decoration: none;
-        }
-
-        .footer-description {
-            color: var(--muted);
-            font-size: clamp(0.9rem, 2.5vw, 0.95rem);
-            margin-bottom: 16px;
-            line-height: 1.6;
-            word-break: break-word;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 12px;
-        }
-
-        .social-link {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--card-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text);
-            transition: var(--transition);
-        }
-
-        .social-link:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .footer-title {
-            font-size: clamp(1.1rem, 3vw, 1.2rem);
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: var(--text);
-        }
-
-        .footer-links {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 10px;
-        }
-
-        .footer-links a {
-            color: var(--muted);
-            text-decoration: none;
-            font-size: clamp(0.9rem, 2.5vw, 0.95rem);
-            transition: var(--transition);
-        }
-
-        .footer-links a:hover {
-            color: var(--primary);
-            padding-left: 4px;
-        }
-
-        .copyright {
-            text-align: center;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--muted);
-            font-size: clamp(0.85rem, 2vw, 0.9rem);
-        }
-
-        @media (max-width: 1024px) {
-            .nav-links { display: none; }
-            .hamburger { display: block; }
-            .features { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-        }
-
-        @media (max-width: 768px) {
-            h1 { font-size: clamp(1.8rem, 5vw, 2.2rem); }
-            p.subtitle { font-size: clamp(0.95rem, 2.5vw, 1.1rem); }
-            .feature { padding: 20px; }
-            .premium-plans { grid-template-columns: 1fr; }
-            .plan { max-width: 400px; margin: 0 auto; }
-        }
-
-        @media (max-width: 576px) {
-            .container { padding: clamp(64px, 12vw, 80px) 12px 64px; }
-            h1 { font-size: clamp(1.6rem, 4.5vw, 1.8rem); }
-            .btn { padding: clamp(10px, 2vw, 12px) clamp(16px, 3vw, 20px); font-size: clamp(0.85rem, 2vw, 0.9rem); }
-            .search-box { padding: clamp(10px, 2vw, 12px); }
-            .premium-title { font-size: clamp(1.6rem, 4vw, 2rem); }
-            .footer-content { grid-template-columns: 1fr; }
         }
     </style>
 </head>
-<body data-theme="dark">
+<body class="bg-gray-900 text-gray-100 font-sans antialiased min-h-screen flex flex-col">
+    <!-- Animated background gradient -->
+    <div class="fixed inset-0 -z-50 opacity-20" style="background: radial-gradient(circle at 70% 30%, #4c1d95, transparent 50%), radial-gradient(circle at 30% 70%, #6d28d9, transparent 50%);"></div>
+    
     <!-- Navigation -->
-    <nav>
-        <a href="#" class="logo" aria-label="GuildHub Home">
-            <i class="fas fa-robot"></i>
-            <span data-translate="guildhub">GuildHub</span>
-        </a>
-        
-        <div class="nav-links">
-            <a href="#" data-translate="home">Home</a>
-            <a href="#features" data-translate="features">Features</a>
-            <a href="#premium" data-translate="premium">Premium</a>
-            <a href="#" data-translate="tags">Tags</a>
-            <a href="#" data-translate="about">About</a>
-        </div>
-        
-        <div class="nav-buttons">
-            <div class="language-selector">
-                <button class="language-btn" aria-label="Select Language">
-                    <i class="fas fa-globe"></i>
-                    <span data-translate="language">English</span>
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="language-dropdown">
-                    <a href="#" data-lang="en" data-translate="english">English</a>
-                    <a href="#" data-lang="es" data-translate="spanish">Español</a>
-                    <a href="#" data-lang="tr" data-translate="turkish">Türkçe</a>
-                    <a href="#" data-lang="ru" data-translate="russian">Русский</a>
-                    <a href="#" data-lang="fr" data-translate="french">Français</a>
-                    <a href="#" data-lang="de" data-translate="german">Deutsch</a>
-                    <a href="#" data-lang="pt" data-translate="portuguese">Português</a>
-                    <a href="#" data-lang="it" data-translate="italian">Italiano</a>
-                    <a href="#" data-lang="zh" data-translate="chinese">中文</a>
-                    <a href="#" data-lang="ar" data-translate="arabic">العربية</a>
+    <nav class="border-b border-gray-800 bg-gray-900/80 backdrop-blur-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="flex items-center space-x-2">
+                        <svg class="w-8 h-8 text-purple-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2L4 7v10l8 5 8-5V7l-8-5zm0 2.5L18 9v6l-6 3.5-6-3.5V9l6-3.5z"/>
+                        </svg>
+                        <span class="text-xl font-bold gradient-text">GuildHub</span>
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#features" class="nav-link px-3 py-2 text-sm font-medium">Özellikler</a>
+                        <a href="#team" class="nav-link px-3 py-2 text-sm font-medium">Ekip</a>
+                        <a href="#projects" class="nav-link px-3 py-2 text-sm font-medium">Projeler</a>
+                        <a href="#docs" class="nav-link px-3 py-2 text-sm font-medium">Dökümanlar</a>
+                        <a href="#contact" class="nav-link px-3 py-2 text-sm font-medium">İletişim</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 rounded-md text-purple-400 hover:text-white hover:bg-purple-900/50 transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <a href="#" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-800 text-sm font-medium rounded-md hover:from-purple-700 hover:to-purple-900 transition-all duration-300 transform hover:scale-105">
+                        Giriş Yap
+                    </a>
                 </div>
             </div>
-            
-            <div class="theme-switcher">
-                <button class="theme-btn" aria-label="Select Theme">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <div class="theme-dropdown">
-                    <button data-theme="dark"><i class="fas fa-moon"></i> <span data-translate="dark">Dark</span></button>
-                    <button data-theme="light"><i class="fas fa-sun"></i> <span data-translate="light">Light</span></button>
-                    <button data-theme="cyberpunk"><i class="fas fa-bolt"></i> <span data-translate="cyberpunk">Cyberpunk</span></button>
-                </div>
-            </div>
-            
-            <button class="btn btn-outline" data-translate="login">Login</button>
         </div>
-        
-        <button class="hamburger" aria-label="Toggle Menu">
-            <i class="fas fa-bars"></i>
-        </button>
     </nav>
-    
-    <!-- Mobile Menu -->
-    <div class="mobile-menu">
-        <div class="nav-links">
-            <a href="#" data-translate="home">Home</a>
-            <a href="#features" data-translate="features">Features</a>
-            <a href="#premium" data-translate="premium">Premium</a>
-            <a href="#" data-translate="tags">Tags</a>
-            <a href="#" data-translate="about">About</a>
-        </div>
-        
-        <div class="nav-buttons">
-            <div class="language-selector">
-                <button class="language-btn" aria-label="Select Language">
-                    <i class="fas fa-globe"></i>
-                    <span data-translate="language">English</span>
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="language-dropdown">
-                    <a href="#" data-lang="en" data-translate="english">English</a>
-                    <a href="#" data-lang="es" data-translate="spanish">Español</a>
-                    <a href="#" data-lang="tr" data-translate="turkish">Türkçe</a>
-                    <a href="#" data-lang="ru" data-translate="russian">Русский</a>
-                    <a href="#" data-lang="fr" data-translate="french">Français</a>
-                    <a href="#" data-lang="de" data-translate="german">Deutsch</a>
-                    <a href="#" data-lang="pt" data-translate="portuguese">Português</a>
-                    <a href="#" data-lang="it" data-translate="italian">Italiano</a>
-                    <a href="#" data-lang="zh" data-translate="chinese">中文</a>
-                    <a href="#" data-lang="ar" data-translate="arabic">العربية</a>
+
+    <!-- Hero Section -->
+    <section class="relative pt-24 pb-32 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-6">
+                        <span class="gradient-text">GuildHub</span> Developer Portal
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-lg">
+                        GuildHub ekosistemi için gelişmiş araçlar, API'lar ve kaynaklar. Yeni nesil geliştirici deneyimi.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="#docs" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-800 text-white font-medium rounded-lg hover:from-purple-700 hover:to-purple-900 transition-all duration-300 transform hover:scale-105 shadow-lg glow-effect">
+                            Dökümanlara Göz At
+                        </a>
+                        <a href="#projects" class="px-6 py-3 border border-purple-600 text-purple-400 font-medium rounded-lg hover:bg-purple-900/30 transition-all duration-300">
+                            Projeleri Keşfet
+                        </a>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="absolute inset-0 bg-purple-900/20 rounded-2xl -rotate-6 blur-xl"></div>
+                    <div class="relative code-block rounded-2xl p-6 overflow-hidden">
+                        <div class="flex space-x-2 mb-4">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        </div>
+                        <pre class="font-mono text-sm text-purple-200 overflow-x-auto"><code><span class="text-purple-400">import</span> { GuildHub } <span class="text-purple-400">from</span> <span class="text-purple-300">'@guildhub/sdk'</span>;
+
+<span class="text-purple-400">const</span> client = <span class="text-purple-400">new</span> <span class="text-blue-400">GuildHub</span>({
+  <span class="text-green-400">apiKey</span>: <span class="text-yellow-300">'YOUR_API_KEY'</span>,
+  <span class="text-green-400">version</span>: <span class="text-yellow-300">'v3'</span>
+});
+
+<span class="text-gray-500">// Guild verilerini çekme</span>
+<span class="text-purple-400">const</span> guild = <span class="text-purple-400">await</span> client.guilds.fetch(<span class="text-yellow-300">'123456789'</span>);
+
+<span class="text-gray-500">// Kullanıcı oluşturma</span>
+<span class="text-purple-400">const</span> user = <span class="text-purple-400">await</span> client.users.create({
+  <span class="text-green-400">username</span>: <span class="text-yellow-300">'PicadorSo2'</span>,
+  <span class="text-green-400">role</span>: <span class="text-yellow-300">'Developer'</span>
+});
+
+<span class="text-blue-400">console</span>.<span class="text-blue-400">log</span>(<span class="text-yellow-300">`Guild: </span><span class="text-purple-300">${</span>guild.name<span class="text-purple-300">}</span><span class="text-yellow-300">`</span>);</code></pre>
+                    </div>
                 </div>
             </div>
+        </div>
+        <div class="absolute top-0 right-0 w-1/3 h-full -z-10 opacity-20">
+            <div class="absolute top-1/4 right-0 w-64 h-64 bg-purple-600 rounded-full filter blur-3xl opacity-70"></div>
+            <div class="absolute top-3/4 right-1/4 w-96 h-96 bg-indigo-600 rounded-full filter blur-3xl opacity-50"></div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-gradient-to-b from-gray-900 to-gray-900/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="gradient-text">Gelişmiş Özellikler</span>
+                </h2>
+                <p class="text-lg text-gray-400 max-w-3xl mx-auto">
+                    GuildHub Developer Portal ile projelerinizi bir üst seviyeye taşıyın. Modern araçlar ve güçlü API'lar.
+                </p>
+            </div>
             
-            <div class="theme-switcher">
-                <button class="theme-btn" aria-label="Select Theme">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <div class="theme-dropdown">
-                    <button data-theme="dark"><i class="fas fa-moon"></i> <span data-translate="dark">Dark</span></button>
-                    <button data-theme="light"><i class="fas fa-sun"></i> <span data-translate="light">Light</span></button>
-                    <button data-theme="cyberpunk"><i class="fas fa-bolt"></i> <span data-translate="cyberpunk">Cyberpunk</span></button>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition-all duration-300 hover:-translate-y-2">
+                    <div class="w-12 h-12 mb-4 rounded-lg bg-purple-900/50 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Yüksek Performans</h3>
+                    <p class="text-gray-400">
+                        Düşük gecikmeli, yüksek performanslı API altyapısı ile kesintisiz hizmet.
+                    </p>
                 </div>
-            </div>
-            
-            <button class="btn btn-outline" data-translate="login">Login</button>
-        </div>
-    </div>
-    
-    <!-- Background blobs -->
-    <div class="background-blobs">
-        <div class="blob"></div>
-        <div class="blob"></div>
-        <div class="blob"></div>
-    </div>
-    
-    <!-- Main content -->
-    <div class="container">
-        <h1 data-translate="discord_tag_archive">Discord Tag Archive</h1>
-        <p class="subtitle" data-translate="tag_archive_description">Browse, search and manage thousands of Discord tags from communities around the world.</p>
-        
-        <button class="btn" data-translate="add_to_discord">Add to Discord</button>
-        
-        <div class="search-box">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 20l-5.5-5.5M17 11a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg>
-            <input type="text" placeholder="Search tags..." data-translate="search_placeholder" aria-label="Search tags" />
-        </div>
-        
-        <div class="features" id="features">
-            <div class="feature">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1h6a1 1 0 0 1 1 1v12h-2V7H4v11a1 1 0 0 1-1-1V4z"/></svg>
-                <h3 data-translate="extensive_archive">Extensive Archive</h3>
-                <p data-translate="extensive_archive_desc">Browse a vast collection of Discord tags from various communities and categories.</p>
-            </div>
-            <div class="feature">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm-7 8a7 7 0 0 1 14 0H5z"/></svg>
-                <h3 data-translate="easy_to_use">Easy to Use</h3>
-                <p data-translate="easy_to_use_desc">Quickly find and manage tags with our intuitive interface and powerful search.</p>
-            </div>
-            <div class="feature">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4.5 8-10a8 8 0 0 0-16 0c0 5.5 8 10 8 10z"/></svg>
-                <h3 data-translate="stay_updated">Stay Updated</h3>
-                <p data-translate="stay_updated_desc">Keep track of the latest tag additions and updates from your favorite communities.</p>
-            </div>
-        </div>
-        
-        <!-- Premium Section -->
-        <div class="premium-section" id="premium">
-            <div class="premium-content">
-                <h2 class="premium-title" data-translate="unlock_premium">Unlock Premium Features</h2>
-                <p class="premium-subtitle" data-translate="premium_description">Upgrade to GuildHub Premium and get access to exclusive features and benefits.</p>
                 
-                <div class="premium-plans">
-                    <div class="plan">
-                        <h3 class="plan-name" data-translate="basic">Basic</h3>
-                        <div class="plan-price">$5</div>
-                        <div class="plan-period" data-translate="month">month</div>
-                        
-                        <div class="plan-features">
-                            <div class="plan-feature">
-                                <i class="fas fa-check"></i>
-                                <span data-translate="basic_feature1">Access to all public tags</span>
-                            </div>
-                            <div class="plan-feature">
-                                <i class="fas fa-check"></i>
-                                <span data-translate="basic_feature2">Basic search filters</span>
-                            </div>
-                            <div class="plan-feature">
-                                <i class="fas fa-check"></i>
-                                <span data-translate="basic_feature3">Save up to 50 tags</span>
-                            </div>
-                        </div>
-                        
-                        <button class="btn btn-outline plan-btn" data-translate="get_started">Get Started</button>
+                <!-- Feature 2 -->
+                <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition-all duration-300 hover:-translate-y-2">
+                    <div class="w-12 h-12 mb-4 rounded-lg bg-purple-900/50 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                        </svg>
                     </div>
-                    
-                    <div class="plan popular">
-                        <div class="popular-badge" data-translate="popular">Popular</div>
-                        <h3 class="plan-name" data-translate="pro">Pro</h3>
-                        <div class="plan-price">$10</div>
-                        <div class="plan-period" data-translate="month">month</div>
-                        
-                        <div class="plan-features">
-                            <div class="plan-feature">
-                                <i class="fas fa-check"></i>
-                                <span data-translate="pro_feature1">Everything in Basic</span>
-                            </div>
-                            <div class="plan-feature">
-                                <i class="fas fa-check"></i>
-                                <span data-translate="pro_feature2">Advanced search filters</span>
-                            </div>
-                            <div class="plan-feature">
-                                <i class="fas fa-check"></i>
-                                <span data-translate="pro_feature3">Save unlimited tags</span>
-                            </div>
-                            <div class="plan-feature">
-                                <i class="fas fa-check"></i>
-                                <span data-translate="pro_feature4">Early access to new features</span>
-                            </div>
-                        </div>
-                        
-                        <button class="btn plan-btn" data-translate="go_pro">Go Pro</button>
+                    <h3 class="text-xl font-semibold mb-2">Gelişmiş Analitik</h3>
+                    <p class="text-gray-400">
+                        Gerçek zamanlı veri analizleri ve detaylı kullanıcı istatistikleri.
+                    </p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition-all duration-300 hover:-translate-y-2">
+                    <div class="w-12 h-12 mb-4 rounded-lg bg-purple-900/50 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
                     </div>
-                    
-                    <div class="plan">
-                        <h3 class="plan-name" data-translate="enterprise">Enterprise</h3>
-                        <div class="plan-price">$25</div>
-                        <div class="plan-period" data-translate="month">month</div>
-                        
-                        <div class="plan-features">
-                            <div class="plan-feature">
-                                <i class="fas fa-check"></i>
-                                <span data-translate="enterprise_feature1">Everything in Pro</span>
-                            </div>
-                            <div class="plan-feature">
-                                <i class="fas fa-check"></i>
-                                <span data-translate="enterprise_feature2">Custom tag categories</span>
-                            </div>
-                            <div class="plan-feature">
-                                <i class="fas fa-check"></i>
-                                <span data-translate="enterprise_feature3">Priority support</span>
-                            </div>
-                            <div class="plan-feature">
-                                <i class="fas fa-check"></i>
-                                <span data-translate="enterprise_feature4">Team management</span>
-                            </div>
-                            <div class="plan-feature">
-                                <i class="fas fa-check"></i>
-                                <span data-translate="enterprise_feature5">API access</span>
-                            </div>
+                    <h3 class="text-xl font-semibold mb-2">Güvenli API</h3>
+                    <p class="text-gray-400">
+                        Endüstri standardında şifreleme ve güvenlik önlemleri ile korunan API'lar.
+                    </p>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition-all duration-300 hover:-translate-y-2">
+                    <div class="w-12 h-12 mb-4 rounded-lg bg-purple-900/50 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Zengin Dökümantasyon</h3>
+                    <p class="text-gray-400">
+                        Detaylı API dökümantasyonu ve kod örnekleri ile kolay entegrasyon.
+                    </p>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition-all duration-300 hover:-translate-y-2">
+                    <div class="w-12 h-12 mb-4 rounded-lg bg-purple-900/50 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Özelleştirilebilir</h3>
+                    <p class="text-gray-400">
+                        İhtiyaçlarınıza göre özelleştirilebilir modüller ve esnek yapılandırma.
+                    </p>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition-all duration-300 hover:-translate-y-2">
+                    <div class="w-12 h-12 mb-4 rounded-lg bg-purple-900/50 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">7/24 Destek</h3>
+                    <p class="text-gray-400">
+                        Uzman ekip tarafından sağlanan teknik destek ve hızlı çözümler.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="py-20 bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="gradient-text">Uzman Ekip</span>
+                </h2>
+                <p class="text-lg text-gray-400 max-w-3xl mx-auto">
+                    GuildHub'ın arkasındaki yetenekli geliştiriciler ve proje yöneticileri.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Team Member 1 -->
+                <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition-all duration-300 group">
+                    <div class="relative mb-6 overflow-hidden rounded-lg h-64">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-indigo-900/20 z-10"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
+                        <img src="https://source.unsplash.com/random/400x400/?developer" alt="Hasan İse" class="w-full h-full object-cover">
+                        <div class="absolute bottom-0 left-0 p-4 z-20">
+                            <h3 class="text-xl font-bold">Hasan İse</h3>
+                            <p class="text-purple-400 font-mono">PicadorSo2</p>
                         </div>
-                        
-                        <button class="btn btn-outline plan-btn" data-translate="contact_us">Contact Us</button>
+                        <div class="absolute top-4 right-4 z-20 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <a href="#" class="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-purple-600 transition-colors">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path>
+                                </svg>
+                            </a>
+                            <a href="#" class="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-purple-600 transition-colors">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+                                </svg>
+                            </a>
+                            <a href="#" class="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-purple-600 transition-colors">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c5.51 0 10-4.48 10-10S17.51 2 12 2zm6.605 4.61a8.502 8.502 0 011.93 5.314c-.281-.054-3.101-.629-5.943-.271-.065-.141-.12-.293-.184-.445a25.416 25.416 0 00-.564-1.236c3.145-1.28 4.577-3.124 4.761-3.362zM12 3.475c2.17 0 4.154.813 5.662 2.148-.152.216-1.443 1.941-4.48 3.08-1.399-2.57-2.95-4.675-3.189-5A8.687 8.687 0 0112 3.475zm-3.633.803a53.896 53.896 0 013.167 4.935c-3.992 1.063-7.517 1.04-7.896 1.04a8.581 8.581 0 014.729-5.975zM3.453 12.01v-.26c.37.01 4.512.065 8.775-1.215.25.477.477.965.694 1.453-.109.033-.228.065-.336.098-4.404 1.42-6.747 5.303-6.942 5.629a8.522 8.522 0 01-2.19-5.705zM12 20.547a8.482 8.482 0 01-5.239-1.8c.152-.315 1.888-3.656 6.703-5.337.022-.01.033-.01.054-.022a35.318 35.318 0 011.823 6.475 8.4 8.4 0 01-3.341.684zm4.761-1.465c-.086-.52-.542-3.015-1.659-6.084 2.679-.423 5.022.271 5.314.369a8.468 8.468 0 01-3.655 5.715z" clip-rule="evenodd"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold mb-2">Web Developer & Bot Uzmanı</h4>
+                        <p class="text-gray-400">
+                            GuildHub'ın temelini oluşturan geliştirici ve proje yöneticisi. Modern web teknolojileri ve bot geliştirme konusunda uzman.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Team Member 2 -->
+                <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition-all duration-300 group">
+                    <div class="relative mb-6 overflow-hidden rounded-lg h-64">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-indigo-900/20 z-10"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
+                        <img src="https://source.unsplash.com/random/400x400/?developer,male" alt="Takım Üyesi" class="w-full h-full object-cover">
+                        <div class="absolute bottom-0 left-0 p-4 z-20">
+                            <h3 class="text-xl font-bold">Mehmet Yılmaz</h3>
+                            <p class="text-purple-400 font-mono">Backend Expert</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold mb-2">Backend Developer</h4>
+                        <p class="text-gray-400">
+                            Yüksek ölçeklenebilir backend sistemleri ve veritabanı yönetimi konusunda uzman.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Team Member 3 -->
+                <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition-all duration-300 group">
+                    <div class="relative mb-6 overflow-hidden rounded-lg h-64">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-indigo-900/20 z-10"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
+                        <img src="https://source.unsplash.com/random/400x400/?developer,female" alt="Takım Üyesi" class="w-full h-full object-cover">
+                        <div class="absolute bottom-0 left-0 p-4 z-20">
+                            <h3 class="text-xl font-bold">Ayşe Demir</h3>
+                            <p class="text-purple-400 font-mono">UI/UX Designer</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold mb-2">UI/UX Designer</h4>
+                        <p class="text-gray-400">
+                            Kullanıcı deneyimi ve arayüz tasarımı konusunda uzman. GuildHub'ın modern arayüzünün arkasındaki isim.
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 bg-gradient-to-b from-gray-900 to-gray-900/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="gradient-text">Projeler</span>
+                </h2>
+                <p class="text-lg text-gray-400 max-w-3xl mx-auto">
+                    GuildHub ekosistemi için geliştirdiğimiz öne çıkan projeler ve çözümler.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Project 1 -->
+                <div class="bg-gray-800/50 rounded-xl overflow-hidden border border-gray-700 hover:border-purple-500 transition-all duration-300 group">
+                    <div class="relative h-48 overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-r from-purple-900/30 to-indigo-900/30 z-10"></div>
+                        <img src="https://source.unsplash.com/random/600x400/?discord,bot" alt="GuildBot Pro" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute bottom-0 left-0 p-4 z-20">
+                            <h3 class="text-xl font-bold">GuildBot Pro</h3>
+                            <p class="text-purple-400 font-mono">Advanced Discord Bot</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-400 mb-4">
+                            Sunucu yönetimi, moderasyon, eğlence ve daha birçok özellik içeren gelişmiş Discord botu.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-purple-900/50 text-purple-300 text-xs rounded">JavaScript</span>
+                            <span class="px-2 py-1 bg-purple-900/50 text-purple-300 text-xs rounded">Node.js</span>
+                            <span class="px-2 py-1 bg-purple-900/50 text-purple-300 text-xs rounded">MongoDB</span>
+                            <span class="px-2 py-1 bg-purple-900/50 text-purple-300 text-xs rounded">Discord.js</span>
+                        </div>
+                        <a href="#" class="text-purple-400 hover:text-purple-300 inline-flex items-center font-medium">
+                            Detayları Gör
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Project 2 -->
+                <div class="bg-gray-800/50 rounded-xl overflow-hidden border border-gray-700 hover:border-purple-500 transition-all duration-300 group">
+                    <div class="relative h-48 overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-r from-purple-900/30 to-indigo-900/30 z-10"></div>
+                        <img src="https://source.unsplash.com/random/600x400/?dashboard,admin" alt="GuildHub API" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute bottom-0 left-0 p-4 z-20">
+                            <h3 class="text-xl font-bold">GuildHub API</h3>
+                            <p class="text-purple-400 font-mono">RESTful API Service</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-400 mb-4">
+                            GuildHub ekosistemi için geliştirilen yüksek performanslı RESTful API servisi.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-purple-900/50 text-purple-300 text-xs rounded">TypeScript</span>
+                            <span class="px-2 py-1 bg-purple-900/50 text-purple-300 text-xs rounded">Express</span>
+                            <span class="px-2 py-1 bg-purple-900/50 text-purple-300 text-xs rounded">PostgreSQL</span>
+                            <span class="px-2 py-1 bg-purple-900/50 text-purple-300 text-xs rounded">Redis</span>
+                        </div>
+                        <a href="#" class="text-purple-400 hover:text-purple-300 inline-flex items-center font-medium">
+                            Detayları Gör
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Documentation Section -->
+    <section id="docs" class="py-20 bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="gradient-text">API Dökümantasyonu</span>
+                </h2>
+                <p class="text-lg text-gray-400 max-w-3xl mx-auto">
+                    GuildHub API'larını kullanmak için ihtiyacınız olan tüm dokümanlar ve kaynaklar.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- Docs Navigation -->
+                <div class="lg:col-span-1">
+                    <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700 sticky top-6">
+                        <h3 class="text-lg font-semibold mb-4 text-purple-400">API Versiyonları</h3>
+                        <ul class="space-y-2">
+                            <li>
+                                <a href="#" class="flex items-center justify-between py-2 px-3 rounded-lg bg-purple-900/30 text-purple-300">
+                                    <span>v3.2 (Latest)</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-700/50 transition-colors">
+                                    <span>v3.1</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-700/50 transition-colors">
+                                    <span>v3.0</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-700/50 transition-colors">
+                                    <span>v2.x</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </a>
+                            </li>
+                        </ul>
+                        
+                        <h3 class="text-lg font-semibold mt-8 mb-4 text-purple-400">Konular</h3>
+                        <ul class="space-y-2">
+                            <li>
+                                <a href="#" class="flex items-center py-2 px-3 rounded-lg hover:bg-gray-700/50 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                    <span>Kimlik Doğrulama</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center py-2 px-3 rounded-lg hover:bg-gray-700/50 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    <span>Kullanıcı Yönetimi</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center py-2 px-3 rounded-lg hover:bg-gray-700/50 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    <span>Sunucu Yönetimi</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center py-2 px-3 rounded-lg hover:bg-gray-700/50 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                    <span>Analitik</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center py-2 px-3 rounded-lg hover:bg-gray-700/50 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                    <span>Güvenlik</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Docs Content -->
+                <div class="lg:col-span-3">
+                    <div class="bg-gray-800/50 rounded-xl p-8 border border-gray-700">
+                        <div class="flex items-center justify-between mb-8">
+                            <div>
+                                <h3 class="text-2xl font-bold mb-2">API'ye Giriş</h3>
+                                <p class="text-gray-400">GuildHub API v3.2 ile geliştirmeye başlayın</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="px-4 py-2 bg-gray-700 rounded-lg text-sm font-medium hover:bg-gray-600 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                    PDF İndir
+                                </button>
+                                <button class="px-4 py-2 bg-purple-900/50 rounded-lg text-sm font-medium text-purple-300 hover:bg-purple-800/50 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
+                                    Postman Koleksiyonu
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="prose prose-invert max-w-none">
+                            <h4 class="text-xl font-semibold mb-4 text-purple-300">Temel Bilgiler</h4>
+                            <p class="mb-6">
+                                GuildHub API, RESTful tasarım prensiplerine uygun olarak geliştirilmiştir. Tüm API çağrıları HTTPS üzerinden yapılmalıdır ve <code class="bg-gray-700 px-1 py-0.5 rounded">https://api.guildhub.online/v3</code> endpoint'i üzerinden erişilebilir.
+                            </p>
+                            
+                            <h4 class="text-xl font-semibold mb-4 text-purple-300">Kimlik Doğrulama</h4>
+                            <p class="mb-4">
+                                GuildHub API'yi kullanmak için bir API anahtarına ihtiyacınız var. Anahtarınızı <a href="#" class="text-purple-400 hover:text-purple-300">Geliştirici Paneli</a> üzerinden oluşturabilirsiniz. API anahtarlarınızı güvenli tutun ve asla istemci tarafı kodlarınızda paylaşmayın.
+                            </p>
+                            
+                            <div class="code-block rounded-lg p-4 mb-6">
+                                <div class="flex items-center text-sm text-gray-400 mb-2">
+                                    <span class="font-mono">Örnek: API anahtarı ile istek</span>
+                                    <button class="ml-auto flex items-center text-purple-400 hover:text-purple-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                        </svg>
+                                        Kopyala
+                                    </button>
+                                </div>
+                                <pre class="font-mono text-sm overflow-x-auto"><code>curl -X GET \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  https://api.guildhub.online/v3/users/me</code></pre>
+                            </div>
+                            
+                            <h4 class="text-xl font-semibold mb-4 text-purple-300">Hata Yönetimi</h4>
+                            <p class="mb-4">
+                                GuildHub API, standart HTTP durum kodlarını kullanır. Başarılı istekler genellikle <code class="bg-gray-700 px-1 py-0.5 rounded">200</code> durum kodu ile yanıt verirken, hatalar uygun durum kodları ile birlikte bir hata mesajı döndürür.
+                            </p>
+                            
+                            <div class="overflow-x-auto mb-6">
+                                <table class="min-w-full divide-y divide-gray-700">
+                                    <thead class="bg-gray-700/50">
+                                        <tr>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-purple-300 uppercase tracking-wider">Kod</th>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-purple-300 uppercase tracking-wider">Açıklama</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-700">
+                                        <tr>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-red-400">400</td>
+                                            <td class="px-4 py-3 text-sm text-gray-400">Geçersiz istek (Bad Request)</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-red-400">401</td>
+                                            <td class="px-4 py-3 text-sm text-gray-400">Yetkisiz erişim (Unauthorized)</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-red-400">403</td>
+                                            <td class="px-4 py-3 text-sm text-gray-400">Erişim reddedildi (Forbidden)</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-red-400">404</td>
+                                            <td class="px-4 py-3 text-sm text-gray-400">Kaynak bulunamadı (Not Found)</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-red-400">429</td>
+                                            <td class="px-4 py-3 text-sm text-gray-400">Çok fazla istek (Rate Limit)</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-red-400">500</td>
+                                            <td class="px-4 py-3 text-sm text-gray-400">Sunucu hatası (Internal Server Error)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <h4 class="text-xl font-semibold mb-4 text-purple-300">Hız Sınırlamaları</h4>
+                            <p class="mb-6">
+                                GuildHub API, kötüye kullanımı önlemek için hız sınırlamaları uygular. Varsayılan olarak dakikada 60 istek gönderebilirsiniz. Hız sınırı aşıldığında <code class="bg-gray-700 px-1 py-0.5 rounded">429</code> durum kodu ile yanıt verilir.
+                            </p>
+                            
+                            <div class="flex items-center justify-between border-t border-gray-700 pt-6">
+                                <a href="#" class="text-purple-400 hover:text-purple-300 inline-flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
+                                    </svg>
+                                    Önceki: API'ye Genel Bakış
+                                </a>
+                                <a href="#" class="text-purple-400 hover:text-purple-300 inline-flex items-center">
+                                    Sonraki: Kullanıcı Yönetimi
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-gradient-to-b from-gray-900/80 to-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="gradient-text">İletişim</span>
+                </h2>
+                <p class="text-lg text-gray-400 max-w-3xl mx-auto">
+                    GuildHub Developer Portal ile ilgili sorularınız veya geri bildirimleriniz mi var? Bizimle iletişime geçin.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div>
+                    <form class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-400 mb-1">Adınız</label>
+                            <input type="text" id="name" name="name" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent focus:outline-none transition-all" placeholder="Adınızı girin">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-400 mb-1">E-posta</label>
+                            <input type="email" id="email" name="email" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent focus:outline-none transition-all" placeholder="email@ornek.com">
+                        </div>
+                        <div>
+                            <label for="subject" class="block text-sm font-medium text-gray-400 mb-1">Konu</label>
+                            <select id="subject" name="subject" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent focus:outline-none transition-all">
+                                <option value="" disabled selected>Bir konu seçin</option>
+                                <option value="api">API Desteği</option>
+                                <option value="bug">Hata Bildirimi</option>
+                                <option value="feature">Özellik Önerisi</option>
+                                <option value="other">Diğer</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-gray-400 mb-1">Mesajınız</label>
+                            <textarea id="message" name="message" rows="5" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent focus:outline-none transition-all" placeholder="Mesajınızı buraya yazın..."></textarea>
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-800 text-white font-medium rounded-lg hover:from-purple-700 hover:to-purple-900 transition-all duration-300 transform hover:scale-[1.02] shadow-lg">
+                                Gönder
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="space-y-8">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4 text-purple-400">Doğrudan İletişim</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 mt-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-400">E-posta</p>
+                                    <p class="text-sm text-purple-300">dev-support@guildhub.online</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 mt-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-400">Discord</p>
+                                    <p class="text-sm text-purple-300">discord.gg/guildhub</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 mt-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-400">Twitter</p>
+                                    <p class="text-sm text-purple-300">@guildhub_dev</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4 text-purple-400">Sık Sorulan Sorular</h3>
+                        <div class="space-y-4">
+                            <div class="border-b border-gray-700 pb-4">
+                                <button class="flex items-center justify-between w-full text-left">
+                                    <span class="text-sm font-medium text-gray-300">API anahtarımı nasıl alabilirim?</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="border-b border-gray-700 pb-4">
+                                <button class="flex items-center justify-between w-full text-left">
+                                    <span class="text-sm font-medium text-gray-300">Hız sınırlamaları nelerdir?</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="border-b border-gray-700 pb-4">
+                                <button class="flex items-center justify-between w-full text-left">
+                                    <span class="text-sm font-medium text-gray-300">Botumu nasıl entegre edebilirim?</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-column">
-                <a href="#" class="footer-logo" aria-label="GuildHub Home">
-                    <i class="fas fa-robot"></i>
-                    <span>GuildHub</span>
-                </a>
-                <p class="footer-description" data-translate="footer_description">The ultimate Discord tag archive for communities and power users.</p>
-                <div class="social-links">
-                    <a href="#" class="social-link" aria-label="Discord"><i class="fab fa-discord"></i></a>
-                    <a href="#" class="social-link" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="social-link" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                    <a href="#" class="social-link" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+    <footer class="bg-gray-900/80 border-t border-gray-800 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-2">
+                    <a href="#" class="flex items-center space-x-2 mb-4">
+                        <svg class="w-8 h-8 text-purple-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2L4 7v10l8 5 8-5V7l-8-5zm0 2.5L18 9v6l-6 3.5-6-3.5V9l6-3.5z"/>
+                        </svg>
+                        <span class="text-xl font-bold gradient-text">GuildHub</span>
+                    </a>
+                    <p class="text-gray-400 text-sm mb-6">
+                        GuildHub Developer Portal, geliştiriciler için güçlü araçlar ve kaynaklar sunar. Modern teknolojilerle inşa edilmiş, yüksek performanslı bir ekosistem.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-purple-400 transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-purple-400 transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-purple-400 transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c5.51 0 10-4.48 10-10S17.51 2 12 2zm6.605 4.61a8.502 8.502 0 011.93 5.314c-.281-.054-3.101-.629-5.943-.271-.065-.141-.12-.293-.184-.445a25.416 25.416 0 00-.564-1.236c3.145-1.28 4.577-3.124 4.761-3.362zM12 3.475c2.17 0 4.154.813 5.662 2.148-.152.216-1.443 1.941-4.48 3.08-1.399-2.57-2.95-4.675-3.189-5A8.687 8.687 0 0112 3.475zm-3.633.803a53.896 53.896 0 013.167 4.935c-3.992 1.063-7.517 1.04-7.896 1.04a8.581 8.581 0 014.729-5.975zM3.453 12.01v-.26c.37.01 4.512.065 8.775-1.215.25.477.477.965.694 1.453-.109.033-.228.065-.336.098-4.404 1.42-6.747 5.303-6.942 5.629a8.522 8.522 0 01-2.19-5.705zM12 20.547a8.482 8.482 0 01-5.239-1.8c.152-.315 1.888-3.656 6.703-5.337.022-.01.033-.01.054-.022a35.318 35.318 0 011.823 6.475 8.4 8.4 0 01-3.341.684zm4.761-1.465c-.086-.52-.542-3.015-1.659-6.084 2.679-.423 5.022.271 5.314.369a8.468 8.468 0 01-3.655 5.715z" clip-rule="evenodd"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-purple-400 transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold text-purple-400 tracking-wider uppercase mb-4">Bağlantılar</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-purple-400 text-sm transition-colors">Ana Sayfa</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-purple-400 text-sm transition-colors">Dökümantasyon</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-purple-400 text-sm transition-colors">API Referansı</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-purple-400 text-sm transition-colors">SSS</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-purple-400 text-sm transition-colors">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold text-purple-400 tracking-wider uppercase mb-4">Yasal</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-purple-400 text-sm transition-colors">Gizlilik Politikası</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-purple-400 text-sm transition-colors">Kullanım Şartları</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-purple-400 text-sm transition-colors">Çerez Politikası</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-purple-400 text-sm transition-colors">Lisans</a></li>
+                    </ul>
                 </div>
             </div>
             
-            <div class="footer-column">
-                <h3 class="footer-title" data-translate="quick_links">Quick Links</h3>
-                <ul class="footer-links">
-                    <li><a href="#" data-translate="home">Home</a></li>
-                    <li><a href="#features" data-translate="features">Features</a></li>
-                    <li><a href="#premium" data-translate="premium">Premium</a></li>
-                    <li><a href="#" data-translate="tags">Tags</a></li>
-                    <li><a href="#" data-translate="about">About</a></li>
-                </ul>
+            <div class="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-sm text-center md:text-left">
+                    © 2023 GuildHub Developer Portal. Tüm hakları saklıdır.
+                </p>
+                <p class="text-gray-500 text-sm mt-4 md:mt-0 text-center md:text-left">
+                    <span class="text-purple-400">guildhub.online</span> alt markasıdır. <span class="text-purple-400">♥️</span> ile kodlanmıştır.
+                </p>
             </div>
-            
-            <div class="footer-column">
-                <h3 class="footer-title" data-translate="resources">Resources</h3>
-                <ul class="footer-links">
-                    <li><a href="#" data-translate="documentation">Documentation</a></li>
-                    <li><a href="#" data-translate="blog">Blog</a></li>
-                    <li><a href="#" data-translate="faq">FAQ</a></li>
-                    <li><a href="#" data-translate="support">Support</a></li>
-                    <li><a href="#" data-translate="community">Community</a></li>
-                </ul>
-            </div>
-            
-            <div class="footer-column">
-                <h3 class="footer-title" data-translate="legal">Legal</h3>
-                <ul class="footer-links">
-                    <li><a href="#" data-translate="privacy_policy">Privacy Policy</a></li>
-                    <li><a href="#" data-translate="terms_of_service">Terms of Service</a></li>
-                    <li><a href="#" data-translate="cookie_policy">Cookie Policy</a></li>
-                    <li><a href="#" data-translate="dmca">DMCA</a></li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="copyright">
-            <p data-translate="copyright">© 2025 GuildHub. All rights reserved.</p>
         </div>
     </footer>
 
     <script>
-        // Translation dictionary for fallback (English as default)
-        const translations = {
-            en: {
-                guildhub: "GuildHub",
-                home: "Home",
-                features: "Features",
-                premium: "Premium",
-                tags: "Tags",
-                about: "About",
-                language: "English",
-                english: "English",
-                spanish: "Español",
-                turkish: "Türkçe",
-                russian: "Русский",
-                french: "Français",
-                german: "Deutsch",
-                portuguese: "Português",
-                italian: "Italiano",
-                chinese: "中文",
-                arabic: "العربية",
-                dark: "Dark",
-                light: "Light",
-                cyberpunk: "Cyberpunk",
-                login: "Login",
-                discord_tag_archive: "Discord Tag Archive",
-                tag_archive_description: "Browse, search and manage thousands of Discord tags from communities around the world.",
-                add_to_discord: "Add to Discord",
-                search_placeholder: "Search tags...",
-                extensive_archive: "Extensive Archive",
-                extensive_archive_desc: "Browse a vast collection of Discord tags from various communities and categories.",
-                easy_to_use: "Easy to Use",
-                easy_to_use_desc: "Quickly find and manage tags with our intuitive interface and powerful search.",
-                stay_updated: "Stay Updated",
-                stay_updated_desc: "Keep track of the latest tag additions and updates from your favorite communities.",
-                unlock_premium: "Unlock Premium Features",
-                premium_description: "Upgrade to GuildHub Premium and get access to exclusive features and benefits.",
-                basic: "Basic",
-                month: "month",
-                basic_feature1: "Access to all public tags",
-                basic_feature2: "Basic search filters",
-                basic_feature3: "Save up to 50 tags",
-                get_started: "Get Started",
-                pro: "Pro",
-                popular: "Popular",
-                pro_feature1: "Everything in Basic",
-                pro_feature2: "Advanced search filters",
-                pro_feature3: "Save unlimited tags",
-                pro_feature4: "Early access to new features",
-                go_pro: "Go Pro",
-                enterprise: "Enterprise",
-                enterprise_feature1: "Everything in Pro",
-                enterprise_feature2: "Custom tag categories",
-                enterprise_feature3: "Priority support",
-                enterprise_feature4: "Team management",
-                enterprise_feature5: "API access",
-                contact_us: "Contact Us",
-                footer_description: "The ultimate Discord tag archive for communities and power users.",
-                quick_links: "Quick Links",
-                resources: "Resources",
-                legal: "Legal",
-                documentation: "Documentation",
-                blog: "Blog",
-                faq: "FAQ",
-                support: "Support",
-                community: "Community",
-                privacy_policy: "Privacy Policy",
-                terms_of_service: "Terms of Service",
-                cookie_policy: "Cookie Policy",
-                dmca: "DMCA",
-                copyright: "© 2025 GuildHub. All rights reserved."
-            }
-        };
-
-        // Supported languages with MyMemory API codes
-        const supportedLanguages = {
-            en: "English",
-            es: "Español",
-            tr: "Türkçe",
-            ru: "Русский",
-            fr: "Français",
-            de: "Deutsch",
-            pt: "Português",
-            it: "Italiano",
-            zh: "中文",
-            ar: "العربية"
-        };
-
-        // Translation cache
-        let translationCache = JSON.parse(localStorage.getItem('translationCache')) || {};
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', () => {
-            // Load saved language or default to English
-            const savedLang = localStorage.getItem('language') || 'en';
-            document.documentElement.lang = savedLang;
-            if (savedLang === 'ar') document.documentElement.dir = 'rtl';
-            else document.documentElement.dir = 'ltr';
-            updateLanguageDisplay(savedLang);
-            translatePage(savedLang);
-
-            // Load saved theme
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            document.body.setAttribute('data-theme', savedTheme);
-
-            // Language selector toggle
-            document.querySelectorAll('.language-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const dropdown = btn.nextElementSibling;
-                    dropdown.classList.toggle('active');
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
                 });
-            });
-
-            // Language change
-            document.querySelectorAll('.language-dropdown a').forEach(link => {
-                link.addEventListener('click', async (e) => {
-                    e.preventDefault();
-                    const lang = link.getAttribute('data-lang');
-                    localStorage.setItem('language', lang);
-                    document.documentElement.lang = lang;
-                    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-                    updateLanguageDisplay(lang);
-                    await translatePage(lang);
-                    document.querySelectorAll('.language-dropdown').forEach(dropdown => {
-                        dropdown.classList.remove('active');
-                    });
-                });
-            });
-
-            // Theme switcher toggle
-            document.querySelectorAll('.theme-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const dropdown = btn.nextElementSibling;
-                    dropdown.classList.toggle('active');
-                });
-            });
-
-            // Theme change
-            document.querySelectorAll('.theme-dropdown button').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const theme = btn.getAttribute('data-theme');
-                    document.body.setAttribute('data-theme', theme);
-                    localStorage.setItem('theme', theme);
-                    document.querySelectorAll('.theme-dropdown').forEach(dropdown => {
-                        dropdown.classList.remove('active');
-                    });
-                });
-            });
-
-            // Hamburger menu toggle
-            document.querySelector('.hamburger').addEventListener('click', () => {
-                document.querySelector('.mobile-menu').classList.toggle('active');
-            });
-
-            // Close dropdowns and mobile menu when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.language-selector') && !e.target.closest('.theme-switcher')) {
-                    document.querySelectorAll('.language-dropdown, .theme-dropdown').forEach(dropdown => {
-                        dropdown.classList.remove('active');
-                    });
-                }
-                if (!e.target.closest('.hamburger') && !e.target.closest('.mobile-menu')) {
-                    document.querySelector('.mobile-menu').classList.remove('active');
-                }
             });
         });
-
-        // Update language button display
-        function updateLanguageDisplay(lang) {
-            document.querySelectorAll('.language-btn span[data-translate="language"]').forEach(span => {
-                span.textContent = supportedLanguages[lang] || 'English';
-            });
-        }
-
-        // Translate page content
-        async function translatePage(targetLang) {
-            if (targetLang === 'en') {
-                applyTranslations(translations.en);
-                return;
-            }
-
-            const elements = document.querySelectorAll('[data-translate]');
-            const textsToTranslate = Array.from(elements).map(el => ({
-                key: el.getAttribute('data-translate'),
-                text: translations.en[el.getAttribute('data-translate')] || el.textContent
-            }));
-
-            for (const item of textsToTranslate) {
-                const cacheKey = `${item.key}_${targetLang}`;
-                if (translationCache[cacheKey]) {
-                    document.querySelectorAll(`[data-translate="${item.key}"]`).forEach(el => {
-                        el.textContent = translationCache[cacheKey];
-                    });
-                } else {
-                    try {
-                        const translatedText = await translateText(item.text, 'en', targetLang);
-                        translationCache[cacheKey] = translatedText;
-                        document.querySelectorAll(`[data-translate="${item.key}"]`).forEach(el => {
-                            el.textContent = translatedText;
-                        });
-                    } catch (error) {
-                        console.error(`Translation error for ${item.key}:`, error);
-                        document.querySelectorAll(`[data-translate="${item.key}"]`).forEach(el => {
-                            el.textContent = translations.en[item.key] || item.text;
-                        });
-                    }
+        
+        // Animation on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fadeIn');
                 }
-            }
-
-            // Update placeholder
-            const searchInput = document.querySelector('.search-box input');
-            const placeholderKey = searchInput.getAttribute('data-translate');
-            const cacheKey = `${placeholderKey}_${targetLang}`;
-            if (translationCache[cacheKey]) {
-                searchInput.placeholder = translationCache[cacheKey];
-            } else {
-                try {
-                    const translatedPlaceholder = await translateText(translations.en[placeholderKey], 'en', targetLang);
-                    translationCache[cacheKey] = translatedPlaceholder;
-                    searchInput.placeholder = translatedPlaceholder;
-                } catch (error) {
-                    console.error('Placeholder translation error:', error);
-                    searchInput.placeholder = translations.en[placeholderKey];
-                }
-            }
-
-            // Save cache to localStorage
-            localStorage.setItem('translationCache', JSON.stringify(translationCache));
-        }
-
-        // Apply translations directly
-        function applyTranslations(translationObj) {
-            document.querySelectorAll('[data-translate]').forEach(el => {
-                const key = el.getAttribute('data-translate');
-                el.textContent = translationObj[key] || el.textContent;
             });
-            const searchInput = document.querySelector('.search-box input');
-            const placeholderKey = searchInput.getAttribute('data-translate');
-            searchInput.placeholder = translationObj[placeholderKey] || searchInput.placeholder;
-        }
-
-        // Translate text using MyMemory API
-        async function translateText(text, sourceLang, targetLang) {
-            // Map language codes to MyMemory format (e.g., 'zh' to 'zh-CN')
-            const langMap = {
-                en: 'en-US',
-                es: 'es-ES',
-                tr: 'tr-TR',
-                ru: 'ru-RU',
-                fr: 'fr-FR',
-                de: 'de-DE',
-                pt: 'pt-PT',
-                it: 'it-IT',
-                zh: 'zh-CN',
-                ar: 'ar-SA'
-            };
-
-            const source = langMap[sourceLang] || sourceLang;
-            const target = langMap[targetLang] || targetLang;
-
-            const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${source}|${target}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
-
-            if (!response.ok) {
-                throw new Error(`MyMemory API error: ${response.status}`);
-            }
-
-            const data = await response.json();
-            if (data.responseStatus !== 200) {
-                throw new Error(`MyMemory API error: ${data.responseDetails}`);
-            }
-
-            return data.responseData.translatedText;
-        }
+        }, {
+            threshold: 0.1
+        });
+        
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
     </script>
 </body>
 </html>
